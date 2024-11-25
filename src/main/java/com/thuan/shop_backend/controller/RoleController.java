@@ -47,7 +47,7 @@ public class RoleController {
     @PutMapping("/{id}")
     public ApiResponse<RoleResponse> updateRole(
             @PathVariable("id") long roleId,
-            @RequestBody RoleRequest roleRequest) {
+            @Valid @RequestBody RoleRequest roleRequest) {
         RoleResponse roleResponse = roleService.updateRole(roleId, roleRequest);
         return ApiResponse.<RoleResponse>builder()
                 .message("Update role success")
