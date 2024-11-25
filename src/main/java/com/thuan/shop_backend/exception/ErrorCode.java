@@ -14,7 +14,10 @@ public enum ErrorCode {
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1005, "You do not have permission", HttpStatus.FORBIDDEN),
     PERMISSION_EXISTED(1006, "Permission is already exist", HttpStatus.BAD_REQUEST),
-    PERMISSION_NOT_EXISTED(1007, "Permission is not exist", HttpStatus.NOT_FOUND);
+    PERMISSION_NOT_EXISTED(1007, "Permission is not exist", HttpStatus.NOT_FOUND),
+    INVALID_PERMISSION(1008, "Invalid permission IDs provided", HttpStatus.BAD_REQUEST),
+    ROLE_EXISTED(1009, "Role is already existed", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXISTED(1010, "Role is not exist", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
