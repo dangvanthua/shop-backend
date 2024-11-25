@@ -1,6 +1,7 @@
 package com.thuan.shop_backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thuan.shop_backend.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserBasicResponse {
+public class UserResponse {
 
     @JsonProperty("id")
     private long id;
@@ -31,6 +32,9 @@ public class UserBasicResponse {
     @JsonProperty("password")
     private String password;
 
+    @JsonProperty("is_active")
+    private boolean isActive;
+
     @JsonProperty("date_of_birth")
     private LocalDate dateOfBirth;
 
@@ -45,4 +49,22 @@ public class UserBasicResponse {
 
     @JsonProperty("role_responses")
     private List<RoleResponse> roleResponses;
+
+    public static UserResponse fromUser(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .isActive(user.getIsActive())
+                .dateOfBirth(user.getDateOfBirth())
+                .avatar(user.getAvatar())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .roleResponses(user.getRole()
+                        .stream()
+                        .map(userRole -> RoleResponse.fromRole(userRole.getRole()))
+                        .toList())
+                .build();
+    }
 }

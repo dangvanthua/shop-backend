@@ -29,6 +29,10 @@ public class RoleService implements IRoleService{
     @Transactional
     public RoleResponse createRole(RoleRequest request) {
 
+        if(roleRepository.existsByName(request.getName())) {
+            throw new AppException(ErrorCode.ROLE_EXISTED);
+        }
+
         List<Permission> permissions = permissionRepository.findAllById(request.getPermissionIds());
 
         if(permissions.isEmpty() || permissions.size() != request.getPermissionIds().size()) {
@@ -54,7 +58,7 @@ public class RoleService implements IRoleService{
 
         rolePermissionRepository.saveAll(rolePermissions);
 
-        return RoleResponse.fromRole(role, permissions);
+        return RoleResponse.fromRole(role);
     }
 
     @Override
@@ -62,13 +66,7 @@ public class RoleService implements IRoleService{
         List<Role> roles = roleRepository.findAll();
 
         return roles.stream()
-                .map(role ->  {
-
-                    List<Permission> permissions = rolePermissionRepository
-                            .findPermissionByRoleId(role.getId());
-
-                    return RoleResponse.fromRole(role, permissions);
-                })
+                .map(RoleResponse::fromRole)
                 .toList();
     }
 
@@ -78,9 +76,7 @@ public class RoleService implements IRoleService{
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
-        List<Permission> permissions = rolePermissionRepository.findPermissionByRoleId(role.getId());
-
-        return RoleResponse.fromRole(role, permissions);
+        return RoleResponse.fromRole(role);
     }
 
     @Override
@@ -121,9 +117,7 @@ public class RoleService implements IRoleService{
 
         role = roleRepository.save(role);
 
-        List<Permission> updatedPermissions = rolePermissionRepository.findPermissionByRoleId(roleId);
-
-        return RoleResponse.fromRole(role, updatedPermissions);
+        return RoleResponse.fromRole(role);
     }
 
     @Override
