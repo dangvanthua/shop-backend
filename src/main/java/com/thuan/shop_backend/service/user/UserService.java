@@ -29,14 +29,7 @@ public class UserService implements IUserService{
     @Transactional
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
 
-        if(userRepository.existsByEmail(userCreateRequest.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-
-        if(userRepository.existsByPhoneNumber(userCreateRequest.getPhoneNumber())) {
-            throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
-        }
-
+        validateUserUniqueness(userCreateRequest.getEmail(), userCreateRequest.getPhoneNumber());
 
         Role role = roleRepository.findByName(PredefinedRole.USER.name().toLowerCase())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
@@ -51,13 +44,17 @@ public class UserService implements IUserService{
 
         user = userRepository.save(user);
 
-        UserRole userRole = UserRole.builder()
-                .role(role)
-                .user(user)
-                .build();
-
-        userRoleRepository.save(userRole);
+        userRoleRepository.save(UserRole.builder().role(role).user(user).build());
 
         return UserResponse.fromUser(user);
+    }
+
+    private void validateUserUniqueness(String email, String phoneNumber) {
+        if (userRepository.existsByEmail(email)) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
+        }
     }
 }
