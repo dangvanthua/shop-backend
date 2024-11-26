@@ -24,3 +24,8 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 
+jwt:
+  signerKey: XcZY99Tw3J9fiSQYbZEIAi2JTfifpUolb2+/3AvVPveVK0or6PJ418iY71DvyUa1
+  valid-duration: 1800
+  refresh-duration: 36000
+
