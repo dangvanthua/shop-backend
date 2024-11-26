@@ -2,7 +2,6 @@ package com.thuan.shop_backend.exception;
 
 import com.thuan.shop_backend.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,12 +12,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @ControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handlingRuntimeException(RuntimeException exception) {
-        log.error("Exception: ", exception);
         ErrorResponse apiResponse = new ErrorResponse();
 
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
@@ -67,7 +64,6 @@ public class GlobalExceptionHandler {
                     .unwrap(ConstraintViolation.class);
 
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
-            log.info(attributes.toString());
 
         }catch (IllegalArgumentException e) {
 

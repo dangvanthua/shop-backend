@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService{
@@ -47,6 +49,69 @@ public class UserService implements IUserService{
         userRoleRepository.save(UserRole.builder().role(role).user(user).build());
 
         return UserResponse.fromUser(user);
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(UserResponse::fromUser)
+                .toList();
+    }
+
+    @Override
+    public UserResponse getUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return UserResponse.fromUser(user);
+    }
+
+    @Override
+    public UserResponse updateUser(
+            long userId,
+            UserCreateRequest userCreateRequest) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (userCreateRequest.getFullName() != null) {
+            user.setFullName(userCreateRequest.getFullName());
+        }
+
+        if (userCreateRequest.getPhoneNumber() != null) {
+            if (userRepository.existsByPhoneNumber(userCreateRequest.getPhoneNumber())
+                    && !user.getPhoneNumber().equals(userCreateRequest.getPhoneNumber())) {
+                throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
+            }
+            user.setPhoneNumber(userCreateRequest.getPhoneNumber());
+        }
+
+        if (userCreateRequest.getEmail() != null) {
+            if (userRepository.existsByEmail(userCreateRequest.getEmail())
+                    && !user.getEmail().equals(userCreateRequest.getEmail())) {
+                throw new AppException(ErrorCode.EMAIL_EXISTED);
+            }
+            user.setEmail(userCreateRequest.getEmail());
+        }
+
+        if (userCreateRequest.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userCreateRequest.getPassword()));
+        }
+
+        if (userCreateRequest.getDateOfBirth() != null) {
+            user.setDateOfBirth(userCreateRequest.getDateOfBirth());
+        }
+
+        user = userRepository.save(user);
+
+        return UserResponse.fromUser(user);
+    }
+
+    @Override
+    public void deleteUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userRepository.delete(user);
     }
 
     private void validateUserUniqueness(String email, String phoneNumber) {
