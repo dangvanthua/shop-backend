@@ -40,7 +40,7 @@ public class AuthService implements IAuthService{
     private final PermissionRepository permissionRepository;
     private final RolePermissionRepository rolePermissionRepository;
 
-    @Value("${jwt.singerKey}")
+    @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
     @Value("${jwt.valid-duration}")

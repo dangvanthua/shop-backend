@@ -1,37 +1,27 @@
 package com.thuan.shop_backend.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RolePermissionId implements Serializable {
+
+    @Column(name = "role_id")
     private Long roleId;
+
+    @Column(name = "permission_id")
     private Long permissionId;
-
-    public RolePermissionId() {}
-
-    public RolePermissionId(Long roleId, Long permissionId) {
-        this.roleId = roleId;
-        this.permissionId = permissionId;
-    }
-
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public Long getPermissionId() {
-        return permissionId;
-    }
-
-    public void setPermissionId(Long permissionId) {
-        this.permissionId = permissionId;
-    }
 
     @Override
     public boolean equals(Object o) {

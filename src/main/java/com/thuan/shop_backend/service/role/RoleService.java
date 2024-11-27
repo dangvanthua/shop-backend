@@ -5,6 +5,7 @@ import com.thuan.shop_backend.dto.response.RoleResponse;
 import com.thuan.shop_backend.entity.Permission;
 import com.thuan.shop_backend.entity.Role;
 import com.thuan.shop_backend.entity.RolePermission;
+import com.thuan.shop_backend.entity.RolePermissionId;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.PermissionRepository;
@@ -40,7 +41,7 @@ public class RoleService implements IRoleService{
         }
 
         Role role = Role.builder()
-                .name(request.getName())
+                .name(request.getName().toUpperCase())
                 .description(request.getDescription())
                 .build();
 
@@ -49,7 +50,13 @@ public class RoleService implements IRoleService{
         List<RolePermission> rolePermissions = new ArrayList<>();
 
         for(Permission permission : permissions) {
+
+            RolePermissionId rolePermissionId = new RolePermissionId(
+                    role.getId(),
+                    permission.getId());
+
             var newRolePermission = RolePermission.builder()
+                    .id(rolePermissionId)
                     .role(role)
                     .permission(permission)
                     .build();

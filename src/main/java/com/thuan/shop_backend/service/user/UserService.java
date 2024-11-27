@@ -33,7 +33,7 @@ public class UserService implements IUserService{
 
         validateUserUniqueness(userCreateRequest.getEmail(), userCreateRequest.getPhoneNumber());
 
-        Role role = roleRepository.findByName(PredefinedRole.USER.name().toLowerCase())
+        Role role = roleRepository.findByName(PredefinedRole.USER.name())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
         User user = User.builder()

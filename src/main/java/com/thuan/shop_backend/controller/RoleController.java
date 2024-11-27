@@ -18,7 +18,8 @@ public class RoleController {
     private final IRoleService roleService;
 
     @PostMapping
-    public ApiResponse<RoleResponse> createRole(@Valid RoleRequest request) {
+    public ApiResponse<RoleResponse> createRole(
+            @Valid @RequestBody RoleRequest request) {
         RoleResponse roleResponse = roleService.createRole(request);
         return ApiResponse.<RoleResponse>builder()
                 .message("Create role success")
