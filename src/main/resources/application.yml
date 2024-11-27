@@ -37,7 +37,7 @@ cloudinary:
 file:
   upload:
     user:
-      avatar: ecommerce/users/avatars/user/
+      avatar: ecommerce/users/avatars/
     product:
       thumbnail: ecommerce/products/thumbnails/
       gallery: ecommerce/products/galleries/

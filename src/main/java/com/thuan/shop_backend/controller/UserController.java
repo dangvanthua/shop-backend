@@ -62,6 +62,7 @@ public class UserController {
                 .build();
     }
 
+    // this function will fix because user not allow to delete
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteUser(@PathVariable("id") long userId) {
         userService.deleteUser(userId);

@@ -12,6 +12,7 @@ import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.RoleRepository;
 import com.thuan.shop_backend.repository.UserRepository;
 import com.thuan.shop_backend.repository.UserRoleRepository;
+import com.thuan.shop_backend.service.file.IFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class UserService implements IUserService{
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
+    private final IFileService fileService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -135,6 +137,10 @@ public class UserService implements IUserService{
 
         if(avatarUrl.isEmpty() || publicId.isEmpty()) {
             throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
+        }
+
+        if(!user.getAvatar().isEmpty()) {
+            fileService.deleteFile(user.getAvatarPublicId());
         }
 
         user.setAvatar(avatarUrl);

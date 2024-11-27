@@ -56,6 +56,7 @@ public class UserResponse {
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
+                .password(user.getPassword())
                 .isActive(user.getIsActive())
                 .dateOfBirth(user.getDateOfBirth())
                 .avatar(user.getAvatar() != null ? user.getAvatar() : "")
