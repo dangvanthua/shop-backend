@@ -41,13 +41,13 @@ public class AuthService implements IAuthService{
     private final RolePermissionRepository rolePermissionRepository;
 
     @Value("${jwt.singerKey}")
-    private String SIGNER_KEY;
+    protected String SIGNER_KEY;
 
     @Value("${jwt.valid-duration}")
-    private long VALID_DURATION;
+    protected long VALID_DURATION;
 
     @Value("${jwt.refresh-duration}")
-    private long REFRESHABLE_DURATION;
+    protected long REFRESHABLE_DURATION;
 
 
     @Override
