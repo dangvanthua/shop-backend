@@ -112,7 +112,13 @@ public class RoleService implements IRoleService{
 
             List<RolePermission> rolePermissions = new ArrayList<>();
             for (Permission permission : permissions) {
+
+                RolePermissionId rolePermissionId = new RolePermissionId(
+                        role.getId(),
+                        permission.getId());
+
                 var newRolePermission = RolePermission.builder()
+                        .id(rolePermissionId)
                         .role(role)
                         .permission(permission)
                         .build();
