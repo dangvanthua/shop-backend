@@ -14,11 +14,11 @@ import java.util.Objects;
 @Builder
 public class UserRoleId implements Serializable {
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column(name = "role_id", nullable = false)
-    private Integer roleId;
+    @Column(name = "role_id")
+    private Long roleId;
 
     @Override
     public boolean equals(Object o) {

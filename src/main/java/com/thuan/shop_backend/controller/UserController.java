@@ -1,6 +1,6 @@
 package com.thuan.shop_backend.controller;
 
-import com.thuan.shop_backend.component.FilePath;
+import com.thuan.shop_backend.component.FilePathComponent;
 import com.thuan.shop_backend.dto.request.UserCreateRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
 import com.thuan.shop_backend.dto.response.UserResponse;
@@ -21,7 +21,7 @@ public class UserController {
 
     private final IUserService userService;
     private final IFileService fileService;
-    private final FilePath filePath;
+    private final FilePathComponent filePathComponent;
 
     @PostMapping
     public ApiResponse<UserResponse> createUser(
@@ -75,7 +75,7 @@ public class UserController {
             @PathVariable("id") long userId,
             @RequestParam("file") MultipartFile file) {
 
-        String folderName = filePath.getUserAvatarPath();
+        String folderName = filePathComponent.getUserAvatarPath();
         Map uploadResult = fileService.uploadFile(file, folderName);
         String publicId = (String) uploadResult.get("public_id");
         String avatarUrl = (String) uploadResult.get("url");

@@ -58,7 +58,7 @@ public class UserResponse {
                 .email(user.getEmail())
                 .isActive(user.getIsActive())
                 .dateOfBirth(user.getDateOfBirth())
-                .avatar(user.getAvatar())
+                .avatar(user.getAvatar() != null ? user.getAvatar() : "")
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .roleResponses(user.getRole()

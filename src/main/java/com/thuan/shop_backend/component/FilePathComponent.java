@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-public class FilePath {
+public class FilePathComponent {
     @Value("${file.upload.user.avatar}")
     private String userAvatarPath;
 

@@ -6,6 +6,7 @@ import com.thuan.shop_backend.dto.response.UserResponse;
 import com.thuan.shop_backend.entity.Role;
 import com.thuan.shop_backend.entity.User;
 import com.thuan.shop_backend.entity.UserRole;
+import com.thuan.shop_backend.entity.UserRoleId;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.RoleRepository;
@@ -42,11 +43,21 @@ public class UserService implements IUserService{
                 .email(userCreateRequest.getEmail())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .dateOfBirth(userCreateRequest.getDateOfBirth())
+                .isActive(false)
                 .build();
 
         user = userRepository.save(user);
 
-        userRoleRepository.save(UserRole.builder().role(role).user(user).build());
+        UserRoleId userRoleId = new UserRoleId(user.getId(), role.getId());
+
+        UserRole userRole = UserRole.builder()
+                .id(userRoleId)
+                .role(role)
+                .user(user)
+                .build();
+
+        userRole = userRoleRepository.save(userRole);
+        user.setRole(List.of(userRole));
 
         return UserResponse.fromUser(user);
     }
