@@ -42,6 +42,9 @@ public class User {
     @Column(name = "avatar")
     private String avatar;
 
+    @Column(name = "avatar_public_id")
+    private String avatarPublicId;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

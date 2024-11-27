@@ -19,7 +19,9 @@ public enum ErrorCode {
     ROLE_EXISTED(1009, "Role is already existed", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED(1010, "Role is not exist", HttpStatus.NOT_FOUND),
     PHONE_NUMBER_EXISTED(1011, "Phone number is already existed", HttpStatus.BAD_REQUEST),
-    EMAIL_EXISTED(1012, "Email is already existed", HttpStatus.BAD_REQUEST);
+    EMAIL_EXISTED(1012, "Email is already existed", HttpStatus.BAD_REQUEST),
+    UPLOAD_FILE_FAILED(1013, "Upload file failed", HttpStatus.BAD_REQUEST),
+    DELETE_FILE_FAILED(1014, "Delete file failed", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

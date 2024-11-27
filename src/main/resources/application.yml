@@ -29,3 +29,20 @@ jwt:
   valid-duration: 1800
   refresh-duration: 36000
 
+cloudinary:
+  cloud-name: du6fyhjnk
+  api-key: 729817939291514
+  api-secret: KFXC17RTjhGrAtZWyXOEBhwqLaw
+
+file:
+  upload:
+    user:
+      avatar: ecommerce/users/avatars/user/
+    product:
+      thumbnail: ecommerce/products/thumbnails/
+      gallery: ecommerce/products/galleries/
+    review:
+      image: ecommerce/reviews/images/
+      video: ecommerce/reviews/videos/
+
+

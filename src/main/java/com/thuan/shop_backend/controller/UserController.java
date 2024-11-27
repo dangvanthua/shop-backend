@@ -1,14 +1,18 @@
 package com.thuan.shop_backend.controller;
 
+import com.thuan.shop_backend.component.FilePath;
 import com.thuan.shop_backend.dto.request.UserCreateRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
 import com.thuan.shop_backend.dto.response.UserResponse;
+import com.thuan.shop_backend.service.file.IFileService;
 import com.thuan.shop_backend.service.user.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -16,6 +20,8 @@ import java.util.List;
 public class UserController {
 
     private final IUserService userService;
+    private final IFileService fileService;
+    private final FilePath filePath;
 
     @PostMapping
     public ApiResponse<UserResponse> createUser(
@@ -61,6 +67,22 @@ public class UserController {
         userService.deleteUser(userId);
         return ApiResponse.<Void>builder()
                 .message("Delete user success")
+                .build();
+    }
+
+    @PostMapping("/avatar/{id}")
+    public ApiResponse<Void> uploadAvatarImage(
+            @PathVariable("id") long userId,
+            @RequestParam("file") MultipartFile file) {
+
+        String folderName = filePath.getUserAvatarPath();
+        Map uploadResult = fileService.uploadFile(file, folderName);
+        String publicId = (String) uploadResult.get("public_id");
+        String avatarUrl = (String) uploadResult.get("url");
+        userService.uploadAvatarUser(userId, publicId, avatarUrl);
+
+        return ApiResponse.<Void>builder()
+                .message("Upload avatar image success")
                 .build();
     }
 }

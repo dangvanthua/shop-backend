@@ -11,4 +11,5 @@ public interface IUserService {
     UserResponse getUser(long userId);
     UserResponse updateUser(long userId, UserCreateRequest userCreateRequest);
     void deleteUser(long userId);
+    void uploadAvatarUser(long userId, String publicId, String avatarUrl);
 }

@@ -67,6 +67,7 @@ public class UserService implements IUserService{
     }
 
     @Override
+    @Transactional
     public UserResponse updateUser(
             long userId,
             UserCreateRequest userCreateRequest) {
@@ -108,10 +109,27 @@ public class UserService implements IUserService{
     }
 
     @Override
+    @Transactional
     public void deleteUser(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public void uploadAvatarUser(long userId, String publicId, String avatarUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if(avatarUrl.isEmpty() || publicId.isEmpty()) {
+            throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
+        }
+
+        user.setAvatar(avatarUrl);
+        user.setAvatarPublicId(publicId);
+
+        userRepository.save(user);
     }
 
     private void validateUserUniqueness(String email, String phoneNumber) {
