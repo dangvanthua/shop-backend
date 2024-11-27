@@ -20,7 +20,8 @@ public class PermissionController {
     @PostMapping
     public ApiResponse<PermissionResponse> createPermission(
             @Valid @RequestBody PermissionRequest permissionRequest) {
-        PermissionResponse permissionResponse = permissionService.createPermission(permissionRequest);
+        PermissionResponse permissionResponse = permissionService
+                .createPermission(permissionRequest);
         return ApiResponse.<PermissionResponse>builder()
                 .message("Create permission success")
                 .result(permissionResponse)
@@ -39,7 +40,8 @@ public class PermissionController {
     @GetMapping("/{id}")
     public ApiResponse<PermissionResponse> getPermission(
             @PathVariable("id") long permissionId) {
-        PermissionResponse permissionResponse = permissionService.getPermissionById(permissionId);
+        PermissionResponse permissionResponse = permissionService
+                .getPermissionById(permissionId);
         return ApiResponse.<PermissionResponse>builder()
                 .message("Get permission success")
                 .result(permissionResponse)

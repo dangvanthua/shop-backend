@@ -21,7 +21,10 @@ public enum ErrorCode {
     PHONE_NUMBER_EXISTED(1011, "Phone number is already existed", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1012, "Email is already existed", HttpStatus.BAD_REQUEST),
     UPLOAD_FILE_FAILED(1013, "Upload file failed", HttpStatus.BAD_REQUEST),
-    DELETE_FILE_FAILED(1014, "Delete file failed", HttpStatus.BAD_REQUEST);
+    DELETE_FILE_FAILED(1014, "Delete file failed", HttpStatus.BAD_REQUEST),
+    PARENT_CATE_NOT_EXISTED(1015, "Parent category not existed", HttpStatus.NOT_FOUND),
+    CATEGORY_EXISTED(1016, "Category already exist", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_EXISTED(1017, "Category not exist", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
