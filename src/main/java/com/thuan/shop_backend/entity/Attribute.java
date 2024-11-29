@@ -33,10 +33,4 @@ public class Attribute {
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "attribute", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CategoryAttribute> categoryAttributes;
-
-    @OneToMany(mappedBy = "attribute", fetch = FetchType.LAZY)
-    private List<ProductAttribute> productAttributes;
 }
