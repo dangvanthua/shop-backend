@@ -3,7 +3,6 @@ package com.thuan.shop_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class ProductVariant {
     private String sku;
 
     @Column(name = "price")
-    private BigDecimal price;
+    private Double price;
 
     @Column(name = "stock_quantity")
     private Integer stockQuantity;

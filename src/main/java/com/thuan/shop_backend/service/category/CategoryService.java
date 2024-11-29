@@ -48,17 +48,16 @@ public class CategoryService implements ICategoryService {
 
         category = categoryRepository.save(category);
 
-        CategoryAttribute categoryAttribute = CategoryAttribute.builder()
-                .category(category)
-                .build();
-
         List<Attribute> attributes = attributeService.getAttributeById(categoryRequest.getAttributeIds());
 
         for (Attribute attribute : attributes) {
-            categoryAttribute.setAttribute(attribute);
-        }
+            CategoryAttribute categoryAttribute = CategoryAttribute.builder()
+                    .category(category)
+                    .attribute(attribute)
+                    .build();
 
-        attCateRepository.save(categoryAttribute);
+            attCateRepository.save(categoryAttribute);
+        }
 
         return CategoryResponse.fromCategory(category);
     }

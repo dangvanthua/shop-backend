@@ -4,7 +4,6 @@ import com.thuan.shop_backend.dto.request.AttributeRequest;
 import com.thuan.shop_backend.dto.response.AttributeResponse;
 import com.thuan.shop_backend.entity.Attribute;
 import com.thuan.shop_backend.entity.CategoryAttribute;
-import com.thuan.shop_backend.entity.ProductAttribute;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.AttributeCateRepository;
