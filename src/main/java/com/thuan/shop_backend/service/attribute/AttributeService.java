@@ -74,10 +74,6 @@ public class AttributeService implements IAttributeService{
             attribute.setDataType(attributeRequest.getDataType());
         }
 
-        if(attributeRequest.getIsVariant() != null) {
-            attribute.setIsVariant(attributeRequest.getIsVariant());
-        }
-
         attribute = attributeRepository.save(attribute);
 
         return AttributeResponse.fromAttribute(attribute);
@@ -91,13 +87,9 @@ public class AttributeService implements IAttributeService{
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_EXIST));
 
         List<CategoryAttribute> categoryAttributes = attributeCateRepository.findByAttribute(attribute);
+
         if(!categoryAttributes.isEmpty()) {
             attributeCateRepository.deleteAll(categoryAttributes);
-        }
-
-        List<ProductAttribute> productAttributes = attributeProductRepository.findByAttribute(attribute);
-        if(!productAttributes.isEmpty()) {
-            attributeProductRepository.deleteAll(productAttributes);
         }
 
         attributeRepository.delete(attribute);

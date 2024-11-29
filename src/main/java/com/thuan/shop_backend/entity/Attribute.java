@@ -27,9 +27,6 @@ public class Attribute {
     @Column(name = "data_type", nullable = false)
     private DataType dataType;
 
-    @Column(name = "is_variant", nullable = false)
-    private Boolean isVariant = false;
-
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

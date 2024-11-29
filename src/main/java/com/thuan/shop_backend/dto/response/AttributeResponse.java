@@ -24,9 +24,6 @@ public class AttributeResponse {
     @JsonProperty("data_type")
     private DataType dataType;
 
-    @JsonProperty("variant")
-    private boolean isVariant;
-
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
@@ -35,7 +32,6 @@ public class AttributeResponse {
                 .id(attribute.getId())
                 .name(attribute.getName())
                 .dataType(attribute.getDataType())
-                .isVariant(attribute.getIsVariant())
                 .createdAt(attribute.getCreatedAt())
                 .build();
     }

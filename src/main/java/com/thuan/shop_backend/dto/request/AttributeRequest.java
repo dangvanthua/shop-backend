@@ -19,7 +19,4 @@ public class AttributeRequest {
 
     @JsonProperty("data_type")
     private DataType dataType;
-
-    @JsonProperty("is_variant")
-    private Boolean isVariant = false;
 }
