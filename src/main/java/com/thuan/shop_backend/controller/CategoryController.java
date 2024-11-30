@@ -46,6 +46,18 @@ public class CategoryController {
                 .build();
     }
 
+    @PutMapping("/{id}")
+    public ApiResponse<CategoryResponse> updateCategory(
+            @PathVariable("id") long categoryId,
+            @Valid @RequestBody CategoryRequest categoryRequest) {
+        CategoryResponse categoryResponse = categoryService.updateCategory(
+                categoryId, categoryRequest);
+        return ApiResponse.<CategoryResponse>builder()
+                .message("Update category success")
+                .result(categoryResponse)
+                .build();
+    }
+
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteCategory(@PathVariable("id") long categoryId) {
         categoryService.deleteCategory(categoryId);

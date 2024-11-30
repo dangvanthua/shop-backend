@@ -86,6 +86,74 @@ public class CategoryService implements ICategoryService {
 
     @Override
     @Transactional
+    public CategoryResponse updateCategory(
+            long categoryId,
+            CategoryRequest categoryRequest) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
+
+        if (categoryRequest.getName() != null && !categoryRequest.getName().equalsIgnoreCase(category.getName())) {
+            if (categoryRepository.existsByName(categoryRequest.getName())) {
+                throw new AppException(ErrorCode.CATEGORY_EXISTED);
+            }
+            category.setName(categoryRequest.getName());
+        }
+
+        if (categoryRequest.getParentId() > 0 &&
+                (category.getParent() == null || categoryRequest.getParentId() != category.getParent().getId())) {
+
+            Category parentCategory = categoryRepository.findById(categoryRequest.getParentId())
+                    .orElseThrow(() -> new AppException(ErrorCode.PARENT_CATE_NOT_EXISTED));
+
+            // Checking must not assign itself as a parent category
+            if (parentCategory.getId() == categoryId) {
+                throw new AppException(ErrorCode.CATEGORY_EXISTED);
+            }
+            category.setParent(parentCategory);
+        }
+
+        if (categoryRequest.getAttributeIds() != null) {
+            List<Long> newAttributeIds = categoryRequest.getAttributeIds();
+            List<CategoryAttribute> existingAttributes = attCateRepository.findByCategory(category);
+
+            // Get current list attribute id
+            List<Long> existingAttributeIds = existingAttributes.stream()
+                    .map(ca -> ca.getAttribute().getId())
+                    .toList();
+
+            // remove attributes don't contain new list
+            List<CategoryAttribute> attributesToDelete = existingAttributes.stream()
+                    .filter(ca -> !newAttributeIds.contains(ca.getAttribute().getId()))
+                    .toList();
+            attCateRepository.deleteAll(attributesToDelete);
+
+            // add to new attributes
+            List<Long> attributesToAdd = newAttributeIds.stream()
+                    .filter(attrId -> !existingAttributeIds.contains(attrId))
+                    .toList();
+
+            List<Attribute> attributes = attributeService.getAttributeById(attributesToAdd);
+
+            for (Attribute attribute : attributes) {
+                CategoryAttribute categoryAttribute = CategoryAttribute.builder()
+                        .category(category)
+                        .attribute(attribute)
+                        .build();
+
+                attCateRepository.save(categoryAttribute);
+            }
+        }
+
+        // update category
+        category = categoryRepository.save(category);
+
+        // return category response
+        return CategoryResponse.fromCategory(category);
+    }
+
+    @Override
+    @Transactional
     public void deleteCategory(long categoryId) {
 
         Category category = categoryRepository.findById(categoryId)

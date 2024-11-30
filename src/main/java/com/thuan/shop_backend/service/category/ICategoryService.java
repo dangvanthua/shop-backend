@@ -9,5 +9,6 @@ public interface ICategoryService {
     CategoryResponse createCategory(CategoryRequest categoryRequest);
     List<CategoryResponse> getAllCategories();
     CategoryResponse getCategory(long categoryId);
+    CategoryResponse updateCategory(long categoryId, CategoryRequest categoryRequest);
     void deleteCategory(long categoryId);
 }
