@@ -30,7 +30,9 @@ public enum ErrorCode {
     ATTRIBUTE_EXISTED(1020, "Attribute already exist", HttpStatus.BAD_REQUEST),
     ATTRIBUTE_NOT_EXIST(1021, "Attribute has not existed", HttpStatus.NOT_FOUND),
     INVALID_ATTRIBUTE_ID_LIST(1022, "Invalid attribute list id", HttpStatus.BAD_REQUEST),
-    INVALID_ATTRIBUTE_ID(1023, "Invalid attribute id", HttpStatus.BAD_REQUEST);
+    INVALID_ATTRIBUTE_ID(1023, "Invalid attribute id", HttpStatus.BAD_REQUEST),
+    SELLER_ALREADY_EXISTS(1024, "Seller already exists", HttpStatus.BAD_REQUEST),
+    STORE_NAME_ALREADY_EXISTS(1025, "Store name already exists", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
