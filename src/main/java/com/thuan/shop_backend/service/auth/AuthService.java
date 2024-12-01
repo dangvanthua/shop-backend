@@ -126,6 +126,11 @@ public class AuthService implements IAuthService{
     }
 
     private String generateToken(User user) {
+
+        if(!user.getIsActive()) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()

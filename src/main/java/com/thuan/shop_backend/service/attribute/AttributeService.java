@@ -7,7 +7,6 @@ import com.thuan.shop_backend.entity.CategoryAttribute;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.AttributeCateRepository;
-import com.thuan.shop_backend.repository.AttributeProductRepository;
 import com.thuan.shop_backend.repository.AttributeRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,7 +21,6 @@ public class AttributeService implements IAttributeService{
 
     private final AttributeRepository attributeRepository;
     private final AttributeCateRepository attributeCateRepository;
-    private final AttributeProductRepository attributeProductRepository;
     private final ModelMapper modelMapper;
 
     @Override
