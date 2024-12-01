@@ -45,7 +45,7 @@ public class UserService implements IUserService{
                 .email(userCreateRequest.getEmail())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .dateOfBirth(userCreateRequest.getDateOfBirth())
-                .isActive(false)
+                .isActive(true)
                 .build();
 
         user = userRepository.save(user);
@@ -119,6 +119,15 @@ public class UserService implements IUserService{
         user = userRepository.save(user);
 
         return UserResponse.fromUser(user);
+    }
+
+    @Override
+    @Transactional
+    public void deactivateUser(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setIsActive(false);
+        userRepository.save(user);
     }
 
     @Override

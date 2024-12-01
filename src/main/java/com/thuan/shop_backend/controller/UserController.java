@@ -62,6 +62,14 @@ public class UserController {
                 .build();
     }
 
+    @PatchMapping("/{id}/deactivate")
+    public ApiResponse<Void> deactivateUser(@PathVariable("id") long userId) {
+        userService.deactivateUser(userId);
+        return ApiResponse.<Void>builder()
+                .message("Block user account success")
+                .build();
+    }
+
     // this function will fix because user not allow to delete
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteUser(@PathVariable("id") long userId) {

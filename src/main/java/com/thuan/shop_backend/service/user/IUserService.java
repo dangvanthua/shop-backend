@@ -10,6 +10,7 @@ public interface IUserService {
     List<UserResponse> getAllUsers();
     UserResponse getUser(long userId);
     UserResponse updateUser(long userId, UserCreateRequest userCreateRequest);
+    void deactivateUser(long userId);
     void deleteUser(long userId);
     void uploadAvatarUser(long userId, String publicId, String avatarUrl);
 }

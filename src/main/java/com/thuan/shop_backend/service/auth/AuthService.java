@@ -164,12 +164,6 @@ public class AuthService implements IAuthService{
         if(!CollectionUtils.isEmpty(user.getRole())) {
             user.getRole().forEach(role -> {
                 stringJoiner.add("ROLE_" + role.getRole().getName());
-                List<Permission> permissions = rolePermissionRepository
-                        .findPermissionByRoleId(role.getRole().getId());
-                if(!CollectionUtils.isEmpty(permissions)) {
-                    permissions.forEach(permission ->
-                            stringJoiner.add(permission.getName()));
-                }
             });
         }
 
