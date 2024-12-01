@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "sellers")
@@ -24,6 +25,9 @@ public class Seller {
 
     @Column(name = "store_name")
     private String storeName;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    private List<PaymentInfo> paymentInfos;
 
     @Column(name = "registration_date")
     @CreationTimestamp

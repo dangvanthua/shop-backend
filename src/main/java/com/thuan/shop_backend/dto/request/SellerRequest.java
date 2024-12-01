@@ -16,4 +16,7 @@ public class SellerRequest {
 
     @JsonProperty("store_name")
     private String storeName;
+
+    @JsonProperty("payment_info")
+    private PaymentInfoRequest paymentInfo;
 }

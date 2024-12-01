@@ -6,10 +6,7 @@ import com.thuan.shop_backend.dto.response.SellerResponse;
 import com.thuan.shop_backend.service.seller.ISellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,7 +18,8 @@ public class SellerController {
     private final ISellerService sellerService;
 
     @PostMapping
-    public ApiResponse<SellerResponse> createSeller(@Valid SellerRequest sellerRequest) {
+    public ApiResponse<SellerResponse> createSeller(
+            @Valid @RequestBody SellerRequest sellerRequest) {
         SellerResponse sellerResponse = sellerService.createSeller(sellerRequest);
         return ApiResponse.<SellerResponse>builder()
                 .message("Create seller success")
@@ -38,4 +36,22 @@ public class SellerController {
                 .build();
     }
 
+    @PutMapping
+    public ApiResponse<SellerResponse> updateSeller(
+            @Valid @RequestBody SellerRequest sellerRequest) {
+        SellerResponse sellerResponse = sellerService.updateSeller(sellerRequest);
+        return ApiResponse.<SellerResponse>builder()
+                .message("Update seller success")
+                .result(sellerResponse)
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<SellerResponse> getSeller(@PathVariable("id") long sellerId) {
+        SellerResponse sellerResponse = sellerService.getSeller(sellerId);
+        return ApiResponse.<SellerResponse>builder()
+                .message("Get seller success")
+                .result(sellerResponse)
+                .build();
+    }
 }

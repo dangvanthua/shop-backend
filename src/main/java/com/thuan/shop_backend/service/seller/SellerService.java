@@ -1,15 +1,13 @@
 package com.thuan.shop_backend.service.seller;
 
 import com.thuan.shop_backend.constant.PredefinedRole;
+import com.thuan.shop_backend.dto.request.PaymentInfoRequest;
 import com.thuan.shop_backend.dto.request.SellerRequest;
 import com.thuan.shop_backend.dto.response.SellerResponse;
 import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
-import com.thuan.shop_backend.repository.RoleRepository;
-import com.thuan.shop_backend.repository.SellerRepository;
-import com.thuan.shop_backend.repository.UserRepository;
-import com.thuan.shop_backend.repository.UserRoleRepository;
+import com.thuan.shop_backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +22,7 @@ public class SellerService implements ISellerService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
+    private final PaymentInfoRepository paymentInfoRepository;
 
 
     @Override
@@ -60,6 +59,19 @@ public class SellerService implements ISellerService {
 
         seller = sellerRepository.save(seller);
 
+        if (sellerRequest.getPaymentInfo() != null) {
+            PaymentInfoRequest paymentInfoRequest = sellerRequest.getPaymentInfo();
+            PaymentInfo paymentInfo = PaymentInfo.builder()
+                    .seller(seller)
+                    .accountName(paymentInfoRequest.getAccountName())
+                    .accountNumber(paymentInfoRequest.getAccountNumber())
+                    .bankName(paymentInfoRequest.getBankName())
+                    .walletProvider(paymentInfoRequest.getWalletProvider())
+                    .walletAddress(paymentInfoRequest.getWalletAddress())
+                    .build();
+            paymentInfoRepository.save(paymentInfo);
+        }
+
         return SellerResponse.fromSeller(seller);
     }
 
@@ -75,5 +87,30 @@ public class SellerService implements ISellerService {
         return sellers.stream()
                 .map(SellerResponse::fromSeller)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public SellerResponse updateSeller(SellerRequest sellerRequest) {
+
+        Seller seller = sellerRepository.findByUserId(sellerRequest.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
+
+        if (!seller.getStoreName().equalsIgnoreCase(sellerRequest.getStoreName()) &&
+                sellerRepository.existsByStoreName(sellerRequest.getStoreName())) {
+            throw new AppException(ErrorCode.STORE_NAME_ALREADY_EXISTS);
+        }
+
+        seller.setStoreName(sellerRequest.getStoreName());
+        seller = sellerRepository.save(seller);
+
+        return SellerResponse.fromSeller(seller);
+    }
+
+    @Override
+    public SellerResponse getSeller(long sellerId) {
+        Seller seller = sellerRepository.findById(sellerId)
+                .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
+        return SellerResponse.fromSeller(seller);
     }
 }
