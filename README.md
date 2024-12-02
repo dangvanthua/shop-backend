@@ -13,29 +13,28 @@ Smart Shop is an e-commerce platform built with Java Spring Boot for the backend
 - **Database**: PostgreSQL for product and user data
 
 ## Tech Stack
-
 - **Backend**: Java 21, Spring Boot 3.3.4
-  ![Java Logo](https://upload.wikimedia.org/wikipedia/commons/3/30/Java_logo_%282015%29.svg)
-  ![Spring Boot Logo](https://upload.wikimedia.org/wikipedia/commons/0/0b/Spring_logo.svg)
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Java_logo_%282015%29.svg" width="50" height="50">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Spring_logo.svg" width="50" height="50">
 
 - **Frontend**: Angular
-  ![Angular Logo](https://upload.wikimedia.org/wikipedia/commons/c/cf/Angular_full_color_logo.svg)
+  <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Angular_full_color_logo.svg" width="50" height="50">
 
 - **Database**: PostgreSQL
-  ![PostgreSQL Logo](https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg)
+  <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" width="50" height="50">
 
 - **Image Storage**: Cloudinary
-  ![Cloudinary Logo](https://res.cloudinary.com/djovgxuqy/image/upload/v1625562880/logo-2021-02-01_f44rqm.svg)
+  <img src="https://res.cloudinary.com/djovgxuqy/image/upload/v1625562880/logo-2021-02-01_f44rqm.svg" width="50" height="50">
 
 - **Authentication**: JWT, OAuth2 (Google/Facebook)
-  ![JWT Logo](https://upload.wikimedia.org/wikipedia/commons/e/e5/JSON_Web_Token_logo.svg)
+  <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/JSON_Web_Token_logo.svg" width="50" height="50">
 
 - **Real-Time Communication**: Spring WebSocket
-  ![Spring WebSocket](https://upload.wikimedia.org/wikipedia/commons/a/a2/Spring_Framework_Logo_2018.svg)
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Spring_Framework_Logo_2018.svg" width="50" height="50">
 
 - **Recommendation System**: Content-based recommendation
-  ![Recommendation Logo](https://upload.wikimedia.org/wikipedia/commons/8/87/Machine_learning_icon.svg)
-
+  <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Machine_learning_icon.svg" width="50" height="50">
+  
 ## Setup
 
 ### Prerequisites
