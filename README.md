@@ -32,6 +32,17 @@ Smart Shop is an e-commerce platform built with Java Spring Boot for the backend
 - Node.js and npm for frontend
 - Cloudinary account for image uploads
 
+### Architecture
+
+graph TD
+    User[Browser/User Device] -->|HTTPS| Frontend[Frontend - Angular]
+    Frontend -->|API Requests| Backend[Backend - Spring Boot]
+    Backend -->|Database Queries| Database[PostgreSQL]
+    Backend -->|Cloudinary API| Cloudinary[Cloudinary]
+    Backend -->|OAuth2 API| OAuth[Google/Facebook OAuth Providers]
+    Backend -->|WebSocket| Messaging[Real-Time Messaging Server]
+
+
 ### Backend Setup
 
 1. **Clone the repository**:
