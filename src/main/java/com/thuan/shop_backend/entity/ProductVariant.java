@@ -2,6 +2,7 @@ package com.thuan.shop_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ProductVariant {
     private Integer stockQuantity;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)

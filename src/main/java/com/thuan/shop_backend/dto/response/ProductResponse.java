@@ -1,6 +1,8 @@
 package com.thuan.shop_backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thuan.shop_backend.entity.Product;
+import com.thuan.shop_backend.entity.ProductImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +24,26 @@ public class ProductResponse {
 
     @JsonProperty("quantity")
     private int quantity;
+
+    @JsonProperty("thumbnail")
+    private String thumbnail;
+
+    public static ProductResponse fromProduct(Product product) {
+
+        String thumbnailUrl = product.getProductImages() != null
+                ? product.getProductImages().stream()
+                .filter(ProductImage::getIsThumbnail)
+                .map(ProductImage::getImageUrl)
+                .findFirst()
+                .orElse(null)
+                : null;
+
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .quantity(product.getQuantity())
+                .thumbnail(thumbnailUrl)
+                .build();
+    }
 }

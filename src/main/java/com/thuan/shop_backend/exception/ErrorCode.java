@@ -33,7 +33,11 @@ public enum ErrorCode {
     INVALID_ATTRIBUTE_ID(1023, "Invalid attribute id", HttpStatus.BAD_REQUEST),
     SELLER_ALREADY_EXISTS(1024, "Seller already exists", HttpStatus.BAD_REQUEST),
     STORE_NAME_ALREADY_EXISTS(1025, "Store name already exists", HttpStatus.BAD_REQUEST),
-    SELLER_NOT_EXISTED(1026, "Seller not existed", HttpStatus.NOT_FOUND);
+    SELLER_NOT_EXISTED(1026, "Seller not existed", HttpStatus.NOT_FOUND),
+    PRODUCT_EXISTED(1027, "Product already existed", HttpStatus.BAD_REQUEST),
+    PRODUCT_NOT_EXISTED(1028, "Product not already existed", HttpStatus.NOT_FOUND),
+    FILE_TOO_LARGE(1029, "File size exceeds the limit of 15MB", HttpStatus.PAYLOAD_TOO_LARGE),
+    FILE_NOT_FOUND(1030, "File is not found", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

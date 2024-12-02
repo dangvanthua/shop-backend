@@ -1,5 +1,6 @@
 package com.thuan.shop_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,6 +34,9 @@ public class Product {
     @Column(name = "quantity")
     private Integer quantity;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private Seller seller;
@@ -52,6 +56,7 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<ProductVariant> productVariants;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product")
+    @JsonManagedReference
     private List<ProductImage> productImages;
 }

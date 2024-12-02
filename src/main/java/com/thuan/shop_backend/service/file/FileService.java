@@ -21,6 +21,11 @@ public class FileService implements IFileService{
     @Override
     public Map uploadFile(MultipartFile file, String folderName) {
         try {
+
+            if (file.getSize() > 15 * 1024 * 1024) {
+                throw new AppException(ErrorCode.FILE_TOO_LARGE);
+            }
+
             return cloudinary.uploader().upload(file.getBytes(),
                     ObjectUtils.asMap("folder", folderName));
         } catch (IOException e) {
