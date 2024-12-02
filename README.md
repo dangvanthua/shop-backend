@@ -97,3 +97,18 @@ Below is the system architecture diagram for Smart Shop:
 
 
 This should now provide all the necessary information for setting up both the backend and frontend while including PostgreSQL as the database.
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE).  
+You may fork this project and use it for personal or commercial purposes. However, any changes must be proposed via Pull Request, and modifications to the original repository are not allowed without explicit permission from the owner.
+
+## Contribution Guidelines
+
+We welcome contributions to improve this project! However, please follow these guidelines:
+1. Fork the repository.
+2. Make your changes on your own fork.
+3. Create a Pull Request to propose your changes to the main repository.
+4. All contributions will be reviewed before being merged.
+
+Direct modifications to the original repository are **not permitted**.
