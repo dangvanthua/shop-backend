@@ -36,7 +36,7 @@ Smart Shop is an e-commerce platform built with Java Spring Boot for the backend
 
 Below is the system architecture diagram for Smart Shop:
 
-![System Architecture](https://drive.google.com/file/d/1F6FMY3ujxrV2JxN0G02VVEZMSXjB56xA/view?usp=drive_link)
+![System Architecture](https://drive.google.com/uc?id=1F6FMY3ujxrV2JxN0G02VVEZMSXjB56xA)
 
 
 ### Backend Setup
