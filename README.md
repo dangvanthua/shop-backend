@@ -88,7 +88,7 @@ Below is the system architecture diagram for Smart Shop:
 
 ## Future Plans
 
-- **Integration with Payment Gateway**: Add support for secure online payments (e.g., Stripe, PayPal).
+- **Integration with Payment Gateway**: Add support for secure online payments (e.g., VNPay, PayPal).
 - **Analytics Dashboard**: Provide sellers with insights into sales trends and user activity.
 - **Advanced Recommendation System**: Incorporate collaborative filtering or hybrid models.
 - **Mobile Application**: Develop a mobile-friendly version or dedicated mobile app.
