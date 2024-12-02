@@ -86,4 +86,14 @@ Below is the system architecture diagram for Smart Shop:
 - **Database**: I updated the database description to use PostgreSQL.
 - **Configuration**: Added details for configuring PostgreSQL in the `application.yml` or `application.properties` file for the backend setup section.
 
+## Future Plans
+
+- **Integration with Payment Gateway**: Add support for secure online payments (e.g., Stripe, PayPal).
+- **Analytics Dashboard**: Provide sellers with insights into sales trends and user activity.
+- **Advanced Recommendation System**: Incorporate collaborative filtering or hybrid models.
+- **Mobile Application**: Develop a mobile-friendly version or dedicated mobile app.
+- **Localization**: Add multi-language and multi-currency support for a global audience.
+- **Improved Search Functionality**: Implement full-text search or Elasticsearch for faster, more accurate product discovery.
+
+
 This should now provide all the necessary information for setting up both the backend and frontend while including PostgreSQL as the database.
