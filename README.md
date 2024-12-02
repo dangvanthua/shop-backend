@@ -73,7 +73,7 @@ Below is the system architecture diagram for Smart Shop:
 
 6. **Navigate to the frontend directory and install dependencies**:
    ```bash
-   cd frontend
+   cd smart-shop
    npm install
    ```
 
