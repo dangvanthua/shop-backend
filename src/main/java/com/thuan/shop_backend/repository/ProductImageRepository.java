@@ -8,6 +8,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
-    @Query("SELECT pi FROM ProductImage pi JOIN FETCH pi.product WHERE pi.product.id = :productId")
+    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId")
     List<ProductImage> findByProductId(@Param("productId") long productId);
+
+    @Query("SELECT COUNT(pi) FROM ProductImage pi " +
+            "WHERE pi.product.id = :productId AND pi.isThumbnail = true")
+    long countByProductIdAndIsThumbnail(@Param("productId") long productId);
 }

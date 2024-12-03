@@ -2,6 +2,7 @@ package com.thuan.shop_backend.controller;
 
 import com.thuan.shop_backend.component.FilePathComponent;
 import com.thuan.shop_backend.dto.request.ProductRequest;
+import com.thuan.shop_backend.dto.request.ProductVariantRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
 import com.thuan.shop_backend.dto.response.ProductResponse;
 import com.thuan.shop_backend.exception.AppException;
@@ -49,6 +50,10 @@ public class ProductController {
             throw new AppException(ErrorCode.FILE_NOT_FOUND);
         }
 
+        if(files.size() > 5) {
+            throw new AppException(ErrorCode.LIMIT_FILE);
+        }
+
         String folderName = null;
         Map<String, String> productImages = new HashMap<>();
 
@@ -71,6 +76,27 @@ public class ProductController {
                 .message(isThumbnail ?
                         "Upload thumbnail image success"
                         : "Upload gallery images success")
+                .build();
+    }
+
+    @GetMapping("/{id}/recommends")
+    public ApiResponse<List<ProductResponse>> recommendProducts(
+            @PathVariable("id") long productId,
+            @RequestParam(defaultValue = "6") int topN) {
+        List<ProductResponse> productResponses = productService.recommendProducts(productId, topN);
+        return ApiResponse.<List<ProductResponse>>builder()
+                .message("Get list product recommendations success")
+                .result(productResponses)
+                .build();
+    }
+
+    @PostMapping("/variants/{id}")
+    public ApiResponse<Void> createVariants(
+            @PathVariable("id") long productId,
+            @Valid @RequestBody List<ProductVariantRequest> productVariantRequests) {
+        productService.createVariant(productId, productVariantRequests);
+        return ApiResponse.<Void>builder()
+                .message("Create variants success")
                 .build();
     }
 }

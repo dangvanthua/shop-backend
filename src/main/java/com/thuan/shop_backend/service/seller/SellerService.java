@@ -40,7 +40,7 @@ public class SellerService implements ISellerService {
             throw new AppException(ErrorCode.STORE_NAME_ALREADY_EXISTS);
         }
 
-        Role sellerRole = roleRepository.findByName("SELLER")
+        Role sellerRole = roleRepository.findByName(PredefinedRole.SELLER.name())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
         if (hasRole(user, PredefinedRole.SELLER.name())) {
@@ -55,6 +55,7 @@ public class SellerService implements ISellerService {
         Seller seller = Seller.builder()
                 .storeName(sellerRequest.getStoreName())
                 .user(user)
+                .isVerified(true)
                 .build();
 
         seller = sellerRepository.save(seller);

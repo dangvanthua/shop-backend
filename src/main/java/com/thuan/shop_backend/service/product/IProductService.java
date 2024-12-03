@@ -13,4 +13,5 @@ public interface IProductService {
     void createVariant(long productId, List<ProductVariantRequest> productVariantRequests);
     void uploadProductImages(long productId, Map<String, String> productImageUrl, boolean isThumbnail);
     List<ProductResponse> getProductByCategory(long categoryId);
+    List<ProductResponse> recommendProducts(long productId, int topN);
 }

@@ -28,6 +28,9 @@ public class ProductResponse {
     @JsonProperty("thumbnail")
     private String thumbnail;
 
+    @JsonProperty("is_active")
+    private boolean isActive;
+
     public static ProductResponse fromProduct(Product product) {
 
         String thumbnailUrl = product.getProductImages() != null
@@ -44,6 +47,7 @@ public class ProductResponse {
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
                 .thumbnail(thumbnailUrl)
+                .isActive(product.getIsActive())
                 .build();
     }
 }
