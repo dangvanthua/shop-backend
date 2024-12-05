@@ -52,11 +52,4 @@ public class Product {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ProductVariant> productVariants;
-
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<ProductImage> productImages;
 }

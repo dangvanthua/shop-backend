@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,15 +33,13 @@ public class ProductResponse {
     @JsonProperty("is_active")
     private boolean isActive;
 
-    public static ProductResponse fromProduct(Product product) {
+    public static ProductResponse fromProduct(Product product, List<ProductImage> productImages) {
 
-        String thumbnailUrl = product.getProductImages() != null
-                ? product.getProductImages().stream()
+        String thumbnailUrl = productImages != null ? productImages.stream()
                 .filter(ProductImage::getIsThumbnail)
                 .map(ProductImage::getImageUrl)
                 .findFirst()
-                .orElse(null)
-                : null;
+                .orElse(null) : null;
 
         return ProductResponse.builder()
                 .id(product.getId())

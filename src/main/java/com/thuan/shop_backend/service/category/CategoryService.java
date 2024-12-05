@@ -10,6 +10,7 @@ import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.attribute.IAttributeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -176,4 +177,5 @@ public class CategoryService implements ICategoryService {
 
         categoryRepository.delete(category);
     }
+
 }

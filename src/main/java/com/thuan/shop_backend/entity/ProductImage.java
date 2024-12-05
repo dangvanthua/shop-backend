@@ -21,7 +21,6 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonBackReference
     private Product product;
 
     @Column(name = "image_url", nullable = false, length = 300)

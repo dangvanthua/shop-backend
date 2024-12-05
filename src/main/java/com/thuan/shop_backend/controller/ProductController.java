@@ -4,6 +4,7 @@ import com.thuan.shop_backend.component.FilePathComponent;
 import com.thuan.shop_backend.dto.request.ProductRequest;
 import com.thuan.shop_backend.dto.request.ProductVariantRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
+import com.thuan.shop_backend.dto.response.ProductListResponse;
 import com.thuan.shop_backend.dto.response.ProductResponse;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
@@ -11,6 +12,9 @@ import com.thuan.shop_backend.service.file.IFileService;
 import com.thuan.shop_backend.service.product.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +101,47 @@ public class ProductController {
         productService.createVariant(productId, productVariantRequests);
         return ApiResponse.<Void>builder()
                 .message("Create variants success")
+                .build();
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<ProductListResponse> getProductByCategory(
+            @PathVariable("id") long categoryId,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ProductResponse> productResponses = productService.getProductByCategory(categoryId, pageable);
+
+        ProductListResponse response = ProductListResponse.builder()
+                .productResponses(productResponses.getContent())
+                .totalPages(productResponses.getTotalPages())
+                .totalItems(productResponses.getTotalElements())
+                .build();
+
+        return ApiResponse.<ProductListResponse>builder()
+                .message("Get product by category success")
+                .result(response)
+                .build();
+    }
+
+    @GetMapping
+    public ApiResponse<ProductListResponse> getFeatureProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+
+        Page<ProductResponse> productResponses = productService.getFeatureProducts(page, size);
+
+        ProductListResponse response = ProductListResponse.builder()
+                .productResponses(productResponses.getContent())
+                .totalPages(productResponses.getTotalPages())
+                .totalItems(productResponses.getTotalElements())
+                .build();
+
+        return ApiResponse.<ProductListResponse>builder()
+                .message("Get feature products success")
+                .result(response)
                 .build();
     }
 }

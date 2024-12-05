@@ -30,7 +30,8 @@ public class SecurityConfig {
     };
 
     private final String[] PUBLIC_ENDPOINT_GET = {
-            "/categories/**"
+            "/categories/**",
+            "/products/**"
     };
 
     @Autowired

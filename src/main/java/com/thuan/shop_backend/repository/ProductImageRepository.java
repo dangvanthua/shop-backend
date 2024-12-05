@@ -14,4 +14,7 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Long
     @Query("SELECT COUNT(pi) FROM ProductImage pi " +
             "WHERE pi.product.id = :productId AND pi.isThumbnail = true")
     long countByProductIdAndIsThumbnail(@Param("productId") long productId);
+
+    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id IN :productIds")
+    List<ProductImage> findByProductIds(@Param("productIds") List<Long> productIds);
 }
