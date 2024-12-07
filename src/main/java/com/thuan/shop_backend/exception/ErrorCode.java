@@ -39,7 +39,8 @@ public enum ErrorCode {
     FILE_TOO_LARGE(1029, "File size exceeds the limit of 15MB", HttpStatus.PAYLOAD_TOO_LARGE),
     FILE_NOT_FOUND(1030, "File is not found", HttpStatus.NOT_FOUND),
     LIMIT_FILE(1031, "Files have limit five", HttpStatus.PAYLOAD_TOO_LARGE),
-    FAILED_RECOMMEND(1032, "Error processing recommendations", HttpStatus.BAD_REQUEST);
+    FAILED_RECOMMEND(1032, "Error processing recommendations", HttpStatus.BAD_REQUEST),
+    SKU_ALREADY_EXISTS(1033, "Sku already exists", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

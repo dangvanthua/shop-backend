@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
     @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId")
@@ -13,8 +14,16 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Long
 
     @Query("SELECT COUNT(pi) FROM ProductImage pi " +
             "WHERE pi.product.id = :productId AND pi.isThumbnail = true")
-    long countByProductIdAndIsThumbnail(@Param("productId") long productId);
+    Long countByProductIdAndIsThumbnail(@Param("productId") long productId);
 
-    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id IN :productIds")
+    @Query("SELECT pi FROM ProductImage pi " +
+            "WHERE pi.product.id IN :productIds " +
+            "AND pi.isThumbnail = true")
     List<ProductImage> findByProductIds(@Param("productIds") List<Long> productIds);
+
+    @Query("SELECT pi FROM ProductImage pi " +
+            "WHERE pi.product.id = :productId " +
+            "AND pi.isThumbnail = true")
+    Optional<ProductImage> findByProductIdAndIsThumbnail(
+            @Param("productId") long productId);
 }

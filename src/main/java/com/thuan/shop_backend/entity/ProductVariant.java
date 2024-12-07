@@ -35,7 +35,4 @@ public class ProductVariant {
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
-    private List<VariantAttribute> variantAttributes;
 }

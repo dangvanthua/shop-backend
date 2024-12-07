@@ -5,7 +5,7 @@ import com.thuan.shop_backend.dto.request.ProdRecommendRequest;
 import com.thuan.shop_backend.dto.request.ProductRequest;
 import com.thuan.shop_backend.dto.request.ProductVariantRequest;
 import com.thuan.shop_backend.dto.request.VariantAttributeRequest;
-import com.thuan.shop_backend.dto.response.ProductResponse;
+import com.thuan.shop_backend.dto.response.*;
 import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
@@ -22,7 +22,7 @@ import weka.core.Instances;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,6 +37,7 @@ public class ProductService implements IProductService{
     private final VariantAttributeRepository variantAttributeRepo;
     private final AttributeRepository attributeRepository;
     private final ProductImageRepository productImageRepository;
+    private final ReviewRepository reviewRepository;
 
     private final IFileService fileService;
     private final FeatureService featureService;
@@ -77,6 +78,12 @@ public class ProductService implements IProductService{
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
         for (ProductVariantRequest variantReq: productVariantRequests) {
+
+            boolean isSkuExists = productVariantRepo.existsBySku(variantReq.getSku());
+            if (isSkuExists) {
+                throw new AppException(ErrorCode.SKU_ALREADY_EXISTS);
+            }
+
             ProductVariant productVariant = ProductVariant.builder()
                     .product(product)
                     .sku(variantReq.getSku())
@@ -108,24 +115,30 @@ public class ProductService implements IProductService{
             Map<String, String> productImageUrl,
             boolean isThumbnail) {
 
+        // Lấy sản phẩm từ cơ sở dữ liệu
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
+        // Kiểm tra số lượng ảnh chính (isThumbnail)
         long existingThumbnailCount = productImageRepository.countByProductIdAndIsThumbnail(productId);
 
-        if(isThumbnail && existingThumbnailCount > 0) {
-            throw new AppException(ErrorCode.UPLOAD_FILE_FAILED);
-        }
+        // Nếu đang upload ảnh chính mới và đã có ảnh chính cũ, xóa ảnh chính cũ
+        if (isThumbnail && existingThumbnailCount > 0) {
+            // Tìm ảnh chính cũ và xóa nó
+            ProductImage existingThumbnail = productImageRepository.findByProductIdAndIsThumbnail(productId)
+                    .orElseThrow(() -> new AppException(ErrorCode.UPLOAD_FILE_FAILED));
 
-        List<ProductImage> existingProductImages = productImageRepository.findByProductId(productId);
-        for (ProductImage existingImage : existingProductImages) {
-            if (existingImage.getCloudinaryPublicId() != null) {
-                fileService.deleteFile(existingImage.getCloudinaryPublicId());
+            // Xóa ảnh cũ trên Cloudinary nếu có
+            if (existingThumbnail.getCloudinaryPublicId() != null) {
+                fileService.deleteFile(existingThumbnail.getCloudinaryPublicId());
             }
-            productImageRepository.delete(existingImage);
+
+            // Xóa ảnh chính cũ trong cơ sở dữ liệu
+            productImageRepository.delete(existingThumbnail);
         }
 
-        productImageUrl.forEach((cloudinaryPublicId,imageUrl) -> {
+        // Upload và lưu các ảnh mới (không xóa ảnh gallery cũ)
+        productImageUrl.forEach((cloudinaryPublicId, imageUrl) -> {
             ProductImage productImage = ProductImage.builder()
                     .product(product)
                     .imageUrl(imageUrl)
@@ -200,32 +213,6 @@ public class ProductService implements IProductService{
         }
     }
 
-    @Override
-    public Page<ProductResponse> getFeatureProducts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<Product> productPage = productRepository.findProductsByTopSelling(OrderStatus.DELIVERED, pageable);
-
-        if (productPage.isEmpty()) {
-            productPage = productRepository.findAll(pageable);
-        }
-
-        List<Long> productIds = productPage.getContent()
-                .stream()
-                .map(Product::getId)
-                .toList();
-
-        List<ProductImage> images = productImageRepository.findByProductIds(productIds);
-
-        Map<Long, List<ProductImage>> imagesGroupedByProduct = images.stream()
-                .collect(Collectors.groupingBy(image -> image.getProduct().getId()));
-
-        return productPage.map(product -> {
-            List<ProductImage> productImages = imagesGroupedByProduct.getOrDefault(product.getId(), Collections.emptyList());
-            return ProductResponse.fromProduct(product, productImages);
-        });
-    }
-
     private int findProductIndex(Product targetProduct) {
         return featureService.getProductIndex(targetProduct.getName());
     }
@@ -259,5 +246,75 @@ public class ProductService implements IProductService{
                     return ProductResponse.fromProduct(product, images);
                 })
                 .toList();
+    }
+
+    @Override
+    public Page<ProductResponse> getFeatureProducts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> productPage = productRepository.findProductsByTopSelling(OrderStatus.DELIVERED, pageable);
+
+        if (productPage.isEmpty()) {
+            productPage = productRepository.findAll(pageable);
+        }
+
+        List<Long> productIds = productPage.getContent()
+                .stream()
+                .map(Product::getId)
+                .toList();
+
+        List<ProductImage> images = productImageRepository.findByProductIds(productIds);
+
+        Map<Long, List<ProductImage>> imagesGroupedByProduct = images.stream()
+                .collect(Collectors.groupingBy(image -> image.getProduct().getId()));
+
+        return productPage.map(product -> {
+            List<ProductImage> productImages = imagesGroupedByProduct.getOrDefault(product.getId(), Collections.emptyList());
+            return ProductResponse.fromProduct(product, productImages);
+        });
+    }
+
+    @Override
+    public ProductDetailResponse getProductDetail(long productId) {
+        // Lấy thông tin sản phẩm
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+
+        // Lấy danh sách hình ảnh của sản phẩm, trả về danh sách rỗng nếu không có ảnh
+        List<ProductImageResponse> imageResponses = Optional.ofNullable(productImageRepository.findByProductId(product.getId()))
+                .orElse(Collections.emptyList())  // Trả về danh sách rỗng nếu không có hình ảnh
+                .stream()
+                .map(image -> ProductImageResponse.builder()
+                        .imageUrl(image.getImageUrl())
+                        .isThumbnail(image.getIsThumbnail())
+                        .build())
+                .collect(Collectors.toList());
+
+        // Lấy thông tin người bán sản phẩm
+        Seller seller = sellerRepository.findSellerByProductId(product.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
+
+        long totalProductsSold = sellerRepository.countProductsSoldBySeller(seller.getId());
+        long totalReviews = reviewRepository.countReviewsBySellerId(seller.getId());
+
+        // Tạo thông tin người bán
+        SellerInfoResponse sellerInfo = SellerInfoResponse.fromSeller(seller, totalProductsSold, totalReviews);
+
+        // Lấy danh sách biến thể của sản phẩm, trả về danh sách rỗng nếu không có biến thể
+        List<ProductVariantResponse> productVariantResponses = Optional.ofNullable(productVariantRepo.findAllProductVariantByProductId(product.getId()))
+                .orElse(Collections.emptyList())  // Trả về danh sách rỗng nếu không có biến thể
+                .stream()
+                .map(variant -> {
+                    List<VariantAttResponse> attributes = variantAttributeRepo.findAllVariantAttByProductId(variant.getId())
+                            .stream()
+                            .map(attr -> VariantAttResponse.fromVariantAttr(attr))
+                            .collect(Collectors.toList());
+
+                    return ProductVariantResponse.fromProductVariant(variant, attributes);
+                })
+                .collect(Collectors.toList());
+
+        // Tạo response và trả về
+        return ProductDetailResponse.fromProductDetail(product, imageResponses, sellerInfo, productVariantResponses);
     }
 }

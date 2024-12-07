@@ -15,4 +15,10 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     @Query("SELECT s FROM Seller s WHERE s.user.id = :userId")
     Optional<Seller> findByUserId(@Param("userId") long userId);
+
+    @Query("SELECT s FROM Seller s JOIN FETCH s.products p WHERE p.id = :productId")
+    Optional<Seller> findSellerByProductId(@Param("productId") long productId);
+
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.seller.id = :sellerId")
+    Long countProductsSoldBySeller(@Param("sellerId") long sellerId);
 }

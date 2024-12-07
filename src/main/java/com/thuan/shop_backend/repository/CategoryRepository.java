@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    boolean existsByName(String name);
+    Boolean existsByName(String name);
     List<Category> findByParentIsNull();
 
     @Query("SELECT c FROM Category c WHERE c.parent.id = :parentCategoryId")

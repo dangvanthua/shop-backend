@@ -4,6 +4,7 @@ import com.thuan.shop_backend.component.FilePathComponent;
 import com.thuan.shop_backend.dto.request.ProductRequest;
 import com.thuan.shop_backend.dto.request.ProductVariantRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
+import com.thuan.shop_backend.dto.response.ProductDetailResponse;
 import com.thuan.shop_backend.dto.response.ProductListResponse;
 import com.thuan.shop_backend.dto.response.ProductResponse;
 import com.thuan.shop_backend.exception.AppException;
@@ -43,7 +44,7 @@ public class ProductController {
     }
 
     @PostMapping(
-            value = "/images/{id}",
+            value = "/{id}/images",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> uploadProductImages(
             @PathVariable("id") long productId,
@@ -54,7 +55,7 @@ public class ProductController {
             throw new AppException(ErrorCode.FILE_NOT_FOUND);
         }
 
-        if(files.size() > 5) {
+        if(files.size() > 5 || (isThumbnail && files.size() > 1)) {
             throw new AppException(ErrorCode.LIMIT_FILE);
         }
 
@@ -94,7 +95,7 @@ public class ProductController {
                 .build();
     }
 
-    @PostMapping("/variants/{id}")
+    @PostMapping("/{id}/variants")
     public ApiResponse<Void> createVariants(
             @PathVariable("id") long productId,
             @Valid @RequestBody List<ProductVariantRequest> productVariantRequests) {
@@ -104,7 +105,7 @@ public class ProductController {
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/category")
     public ApiResponse<ProductListResponse> getProductByCategory(
             @PathVariable("id") long categoryId,
             @RequestParam("page") int page,
@@ -142,6 +143,16 @@ public class ProductController {
         return ApiResponse.<ProductListResponse>builder()
                 .message("Get feature products success")
                 .result(response)
+                .build();
+    }
+
+    @GetMapping("/{id}/detail")
+    public ApiResponse<ProductDetailResponse> getProductDetail(
+            @PathVariable("id") long productId) {
+        ProductDetailResponse productDetailResponse = productService.getProductDetail(productId);
+        return ApiResponse.<ProductDetailResponse>builder()
+                .message("Get product detail success")
+                .result(productDetailResponse)
                 .build();
     }
 }

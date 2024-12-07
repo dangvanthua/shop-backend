@@ -27,7 +27,7 @@ public class Seller {
     private String storeName;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
-    private List<PaymentInfo> paymentInfos;
+    private List<Product> products;
 
     @Column(name = "registration_date")
     @CreationTimestamp

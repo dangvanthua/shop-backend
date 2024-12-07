@@ -26,9 +26,6 @@ public class SellerResponse {
     @JsonProperty("is_verified")
     private boolean isVerified;
 
-    @JsonProperty("fullname")
-    private String fullName;
-
     @JsonProperty("phone_number")
     private String phoneNumber;
 
@@ -45,7 +42,6 @@ public class SellerResponse {
                 .storeName(seller.getStoreName())
                 .registrationDate(seller.getRegistrationDate())
                 .isVerified(seller.getIsVerified())
-                .fullName(seller.getUser().getFullName())
                 .phoneNumber(seller.getUser().getPhoneNumber())
                 .email(seller.getUser().getEmail())
                 .avatar(seller.getUser().getAvatar())
