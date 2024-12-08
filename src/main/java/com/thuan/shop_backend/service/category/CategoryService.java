@@ -2,15 +2,11 @@ package com.thuan.shop_backend.service.category;
 
 import com.thuan.shop_backend.dto.request.CategoryRequest;
 import com.thuan.shop_backend.dto.response.CategoryResponse;
-import com.thuan.shop_backend.entity.Attribute;
 import com.thuan.shop_backend.entity.Category;
-import com.thuan.shop_backend.entity.CategoryAttribute;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
-import com.thuan.shop_backend.service.attribute.IAttributeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +19,6 @@ public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
-    private final AttributeCateRepository attCateRepository;
-    private final IAttributeService attributeService;
 
     @Override
     @Transactional
@@ -49,23 +43,13 @@ public class CategoryService implements ICategoryService {
 
         category = categoryRepository.save(category);
 
-        List<Attribute> attributes = attributeService.getAttributeById(categoryRequest.getAttributeIds());
-
-        for (Attribute attribute : attributes) {
-            CategoryAttribute categoryAttribute = CategoryAttribute.builder()
-                    .category(category)
-                    .attribute(attribute)
-                    .build();
-
-            attCateRepository.save(categoryAttribute);
-        }
-
         return CategoryResponse.fromCategory(category);
     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
-        List<Category> categories = categoryRepository.findByParentIsNull();
+        List<Category> categories = categoryRepository
+                .findAllCategoriesWithDistinctSubcategories();
 
         if(categories.isEmpty()) {
             throw new AppException(ErrorCode.CATEGORY_NOT_EXISTED);
@@ -114,38 +98,6 @@ public class CategoryService implements ICategoryService {
             category.setParent(parentCategory);
         }
 
-        if (categoryRequest.getAttributeIds() != null) {
-            List<Long> newAttributeIds = categoryRequest.getAttributeIds();
-            List<CategoryAttribute> existingAttributes = attCateRepository.findByCategory(category);
-
-            // Get current list attribute id
-            List<Long> existingAttributeIds = existingAttributes.stream()
-                    .map(ca -> ca.getAttribute().getId())
-                    .toList();
-
-            // remove attributes don't contain new list
-            List<CategoryAttribute> attributesToDelete = existingAttributes.stream()
-                    .filter(ca -> !newAttributeIds.contains(ca.getAttribute().getId()))
-                    .toList();
-            attCateRepository.deleteAll(attributesToDelete);
-
-            // add to new attributes
-            List<Long> attributesToAdd = newAttributeIds.stream()
-                    .filter(attrId -> !existingAttributeIds.contains(attrId))
-                    .toList();
-
-            List<Attribute> attributes = attributeService.getAttributeById(attributesToAdd);
-
-            for (Attribute attribute : attributes) {
-                CategoryAttribute categoryAttribute = CategoryAttribute.builder()
-                        .category(category)
-                        .attribute(attribute)
-                        .build();
-
-                attCateRepository.save(categoryAttribute);
-            }
-        }
-
         // update category
         category = categoryRepository.save(category);
 
@@ -168,11 +120,6 @@ public class CategoryService implements ICategoryService {
 
         if(existProducts) {
             throw new AppException(ErrorCode.CATEGORY_HAS_PRODUCTS);
-        }
-
-        List<CategoryAttribute> categoryAttributes = attCateRepository.findByCategory(category);
-        if (!categoryAttributes.isEmpty()) {
-            attCateRepository.deleteAll(categoryAttributes);
         }
 
         categoryRepository.delete(category);

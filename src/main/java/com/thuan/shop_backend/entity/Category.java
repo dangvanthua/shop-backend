@@ -37,6 +37,4 @@ public class Category {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CategoryAttribute> categoryAttributes;
 }

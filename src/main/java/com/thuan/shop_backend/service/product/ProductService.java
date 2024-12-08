@@ -3,8 +3,6 @@ package com.thuan.shop_backend.service.product;
 import com.thuan.shop_backend.constant.OrderStatus;
 import com.thuan.shop_backend.dto.request.ProdRecommendRequest;
 import com.thuan.shop_backend.dto.request.ProductRequest;
-import com.thuan.shop_backend.dto.request.ProductVariantRequest;
-import com.thuan.shop_backend.dto.request.VariantAttributeRequest;
 import com.thuan.shop_backend.dto.response.*;
 import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
@@ -33,9 +31,6 @@ public class ProductService implements IProductService{
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
     private final CategoryRepository categoryRepository;
-    private final ProductVariantRepository productVariantRepo;
-    private final VariantAttributeRepository variantAttributeRepo;
-    private final AttributeRepository attributeRepository;
     private final ProductImageRepository productImageRepository;
     private final ReviewRepository reviewRepository;
 
@@ -68,45 +63,6 @@ public class ProductService implements IProductService{
         return ProductResponse.fromProduct(product, null);
     }
 
-    @Override
-    @Transactional
-    public void createVariant(
-            long productId,
-            List<ProductVariantRequest> productVariantRequests) {
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
-
-        for (ProductVariantRequest variantReq: productVariantRequests) {
-
-            boolean isSkuExists = productVariantRepo.existsBySku(variantReq.getSku());
-            if (isSkuExists) {
-                throw new AppException(ErrorCode.SKU_ALREADY_EXISTS);
-            }
-
-            ProductVariant productVariant = ProductVariant.builder()
-                    .product(product)
-                    .sku(variantReq.getSku())
-                    .price(variantReq.getPrice())
-                    .stockQuantity(variantReq.getStockQuantity())
-                    .build();
-            productVariant = productVariantRepo.save(productVariant);
-
-            for(VariantAttributeRequest attReq: variantReq.getAttributeRequests()) {
-
-                Attribute attribute = attributeRepository.findById(attReq.getAttributeId())
-                        .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_EXIST));
-
-                VariantAttribute variantAttribute = VariantAttribute.builder()
-                        .productVariant(productVariant)
-                        .attribute(attribute)
-                        .value(attReq.getValue())
-                        .build();
-                
-                variantAttributeRepo.save(variantAttribute);
-            }
-        }
-    }
 
     @Override
     @Transactional
@@ -300,21 +256,7 @@ public class ProductService implements IProductService{
         // Tạo thông tin người bán
         SellerInfoResponse sellerInfo = SellerInfoResponse.fromSeller(seller, totalProductsSold, totalReviews);
 
-        // Lấy danh sách biến thể của sản phẩm, trả về danh sách rỗng nếu không có biến thể
-        List<ProductVariantResponse> productVariantResponses = Optional.ofNullable(productVariantRepo.findAllProductVariantByProductId(product.getId()))
-                .orElse(Collections.emptyList())  // Trả về danh sách rỗng nếu không có biến thể
-                .stream()
-                .map(variant -> {
-                    List<VariantAttResponse> attributes = variantAttributeRepo.findAllVariantAttByProductId(variant.getId())
-                            .stream()
-                            .map(attr -> VariantAttResponse.fromVariantAttr(attr))
-                            .collect(Collectors.toList());
-
-                    return ProductVariantResponse.fromProductVariant(variant, attributes);
-                })
-                .collect(Collectors.toList());
-
         // Tạo response và trả về
-        return ProductDetailResponse.fromProductDetail(product, imageResponses, sellerInfo, productVariantResponses);
+        return ProductDetailResponse.fromProductDetail(product, imageResponses, sellerInfo);
     }
 }

@@ -11,7 +11,9 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Boolean existsByName(String name);
-    List<Category> findByParentIsNull();
+
+    @Query("SELECT DISTINCT c FROM Category c LEFT JOIN FETCH c.subcategories WHERE c.parent IS NULL")
+    List<Category> findAllCategoriesWithDistinctSubcategories();
 
     @Query("SELECT c FROM Category c WHERE c.parent.id = :parentCategoryId")
     List<Category> findSubcategories(@Param("parentCategoryId") long parentCategoryId);

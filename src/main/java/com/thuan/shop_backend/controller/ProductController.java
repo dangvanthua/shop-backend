@@ -2,7 +2,6 @@ package com.thuan.shop_backend.controller;
 
 import com.thuan.shop_backend.component.FilePathComponent;
 import com.thuan.shop_backend.dto.request.ProductRequest;
-import com.thuan.shop_backend.dto.request.ProductVariantRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
 import com.thuan.shop_backend.dto.response.ProductDetailResponse;
 import com.thuan.shop_backend.dto.response.ProductListResponse;
@@ -87,7 +86,7 @@ public class ProductController {
     @GetMapping("/{id}/recommends")
     public ApiResponse<List<ProductResponse>> recommendProducts(
             @PathVariable("id") long productId,
-            @RequestParam(defaultValue = "6") int topN) {
+            @RequestParam(defaultValue = "8") int topN) {
         List<ProductResponse> productResponses = productService.recommendProducts(productId, topN);
         return ApiResponse.<List<ProductResponse>>builder()
                 .message("Get list product recommendations success")
@@ -95,15 +94,6 @@ public class ProductController {
                 .build();
     }
 
-    @PostMapping("/{id}/variants")
-    public ApiResponse<Void> createVariants(
-            @PathVariable("id") long productId,
-            @Valid @RequestBody List<ProductVariantRequest> productVariantRequests) {
-        productService.createVariant(productId, productVariantRequests);
-        return ApiResponse.<Void>builder()
-                .message("Create variants success")
-                .build();
-    }
 
     @GetMapping("/{id}/category")
     public ApiResponse<ProductListResponse> getProductByCategory(

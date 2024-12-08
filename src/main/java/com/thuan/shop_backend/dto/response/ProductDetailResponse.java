@@ -2,7 +2,6 @@ package com.thuan.shop_backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thuan.shop_backend.entity.Product;
-import com.thuan.shop_backend.entity.ProductVariant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,14 +38,10 @@ public class ProductDetailResponse {
     @JsonProperty("seller_info")
     private SellerInfoResponse sellerInfo;
 
-    @JsonProperty("product_variants")
-    private List<ProductVariantResponse> productVariants;
-
     public static ProductDetailResponse fromProductDetail(
             Product product,
             List<ProductImageResponse> imageUrls,
-            SellerInfoResponse sellerInfo,
-            List<ProductVariantResponse> productVariants) {
+            SellerInfoResponse sellerInfo) {
 
         return ProductDetailResponse.builder()
                 .id(product.getId())
@@ -57,7 +52,6 @@ public class ProductDetailResponse {
                 .isActive(product.getIsActive())
                 .imageUrls(imageUrls)
                 .sellerInfo(sellerInfo)
-                .productVariants(productVariants)
                 .build();
     }
 }
