@@ -31,7 +31,4 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
     private PaymentStatus paymentStatus;
-
-    @Column(name = "payment_method")
-    private String paymentMethod;
 }

@@ -1,4 +1,4 @@
-package com.thuan.shop_backend.dto.response;
+package com.thuan.shop_backend.dto.response.seller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thuan.shop_backend.entity.Seller;

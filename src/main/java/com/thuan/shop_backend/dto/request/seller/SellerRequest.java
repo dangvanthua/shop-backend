@@ -1,6 +1,7 @@
-package com.thuan.shop_backend.dto.request;
+package com.thuan.shop_backend.dto.request.seller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thuan.shop_backend.dto.request.payment.PaymentInfoRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

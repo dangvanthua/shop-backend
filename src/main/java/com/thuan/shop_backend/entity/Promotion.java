@@ -21,9 +21,8 @@ public class Promotion {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "discount_type", nullable = false)
-    private DiscountType discountType;
+    @Column(name = "discount_type")
+    private String discountType;
 
     @Column(name = "discount_value")
     private Float discountValue;

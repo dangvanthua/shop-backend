@@ -1,8 +1,9 @@
 package com.thuan.shop_backend.controller;
 
-import com.thuan.shop_backend.dto.request.PermissionRequest;
+import com.thuan.shop_backend.dto.request.permission.PermissionRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
-import com.thuan.shop_backend.dto.response.PermissionResponse;
+import com.thuan.shop_backend.dto.response.permisson.PermissionResponse;
+import com.thuan.shop_backend.entity.Permission;
 import com.thuan.shop_backend.service.permission.IPermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,13 @@ public class PermissionController {
     private final IPermissionService permissionService;
 
     @PostMapping
-    public ApiResponse<PermissionResponse> createPermission(
+    public ApiResponse<Permission> createPermission(
             @Valid @RequestBody PermissionRequest permissionRequest) {
-        PermissionResponse permissionResponse = permissionService
+        Permission permission = permissionService
                 .createPermission(permissionRequest);
-        return ApiResponse.<PermissionResponse>builder()
+        return ApiResponse.<Permission>builder()
                 .message("Create permission success")
-                .result(permissionResponse)
+                .result(permission)
                 .build();
     }
 
@@ -49,14 +50,14 @@ public class PermissionController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<PermissionResponse> updatePermission(
+    public ApiResponse<Permission> updatePermission(
             @PathVariable("id") long permissionId,
             @Valid @RequestBody PermissionRequest permissionRequest) {
-        PermissionResponse permissionResponse = permissionService.updatePermission(
+        Permission permission = permissionService.updatePermission(
                 permissionId, permissionRequest);
-        return ApiResponse.<PermissionResponse>builder()
+        return ApiResponse.<Permission>builder()
                 .message("Update permission success")
-                .result(permissionResponse)
+                .result(permission)
                 .build();
     }
 

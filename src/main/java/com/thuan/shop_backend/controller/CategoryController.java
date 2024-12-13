@@ -1,8 +1,9 @@
 package com.thuan.shop_backend.controller;
 
-import com.thuan.shop_backend.dto.request.CategoryRequest;
+import com.thuan.shop_backend.dto.request.category.CategoryRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
-import com.thuan.shop_backend.dto.response.CategoryResponse;
+import com.thuan.shop_backend.dto.response.category.CategoryResponse;
+import com.thuan.shop_backend.entity.Category;
 import com.thuan.shop_backend.service.category.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,12 @@ public class CategoryController {
     private final ICategoryService categoryService;
 
     @PostMapping
-    public ApiResponse<CategoryResponse> createCategory(
+    public ApiResponse<Category> createCategory(
             @Valid @RequestBody CategoryRequest categoryRequest) {
-        CategoryResponse categoryResponse = categoryService.createCategory(categoryRequest);
-        return ApiResponse.<CategoryResponse>builder()
+        Category category = categoryService.createCategory(categoryRequest);
+        return ApiResponse.<Category>builder()
                 .message("Create category success")
-                .result(categoryResponse)
+                .result(category)
                 .build();
     }
 
@@ -47,14 +48,14 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<CategoryResponse> updateCategory(
+    public ApiResponse<Category> updateCategory(
             @PathVariable("id") long categoryId,
             @Valid @RequestBody CategoryRequest categoryRequest) {
-        CategoryResponse categoryResponse = categoryService.updateCategory(
+        Category category = categoryService.updateCategory(
                 categoryId, categoryRequest);
-        return ApiResponse.<CategoryResponse>builder()
+        return ApiResponse.<Category>builder()
                 .message("Update category success")
-                .result(categoryResponse)
+                .result(category)
                 .build();
     }
 

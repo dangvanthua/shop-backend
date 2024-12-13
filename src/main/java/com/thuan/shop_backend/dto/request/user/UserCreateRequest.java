@@ -1,4 +1,4 @@
-package com.thuan.shop_backend.dto.request;
+package com.thuan.shop_backend.dto.request.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;

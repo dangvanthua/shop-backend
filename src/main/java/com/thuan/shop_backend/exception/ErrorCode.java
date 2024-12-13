@@ -40,7 +40,17 @@ public enum ErrorCode {
     FILE_NOT_FOUND(1030, "File is not found", HttpStatus.NOT_FOUND),
     LIMIT_FILE(1031, "Files have limit five", HttpStatus.PAYLOAD_TOO_LARGE),
     FAILED_RECOMMEND(1032, "Error processing recommendations", HttpStatus.BAD_REQUEST),
-    SKU_ALREADY_EXISTS(1033, "Sku already exists", HttpStatus.BAD_REQUEST);
+    PROMOTION_NOT_EXISTED(1033, "Promotion not exist", HttpStatus.NOT_FOUND),
+    PROMOTION_EXISTED(1034, "Promotion already existed", HttpStatus.BAD_REQUEST),
+    PROMOTION_CODE_EXISTED(1035, "Promotion already existed", HttpStatus.BAD_REQUEST),
+    PROMOTION_CODE_NOT_EXISTED(1036, "Promotion code not exist", HttpStatus.NOT_FOUND),
+    INVALID_DISCOUNT_VALUE(1037, "Percentage discount value is invalid", HttpStatus.BAD_REQUEST),
+    INVALID_DATE_VALUE(1038, "Date of promotion is invalid", HttpStatus.BAD_REQUEST),
+    PROMOTION_CODE_EXPIRED(1039, "Promotion code expired", HttpStatus.BAD_REQUEST),
+    INVALID_PAYMENT_INFO(1040, "Invalid payment info", HttpStatus.BAD_REQUEST),
+    ORDER_NOT_EXISTED(1041, "Order not existed", HttpStatus.NOT_FOUND),
+    INVALID_ORDER_STATUS(1042, "Invalid order status", HttpStatus.BAD_REQUEST),
+    INSUFFICIENT_STOCK(1043, "Product insufficient stock", HttpStatus.INSUFFICIENT_STORAGE);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

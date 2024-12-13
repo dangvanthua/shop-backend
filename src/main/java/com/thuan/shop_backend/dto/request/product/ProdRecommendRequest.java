@@ -1,4 +1,4 @@
-package com.thuan.shop_backend.dto.request;
+package com.thuan.shop_backend.dto.request.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

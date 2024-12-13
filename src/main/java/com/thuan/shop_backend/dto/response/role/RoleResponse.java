@@ -1,14 +1,11 @@
-package com.thuan.shop_backend.dto.response;
+package com.thuan.shop_backend.dto.response.role;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thuan.shop_backend.entity.Permission;
 import com.thuan.shop_backend.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor

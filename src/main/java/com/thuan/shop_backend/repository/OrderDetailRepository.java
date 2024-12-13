@@ -1,4 +1,7 @@
 package com.thuan.shop_backend.repository;
 
-public interface OrderDetailRepository {
+import com.thuan.shop_backend.entity.OrderDetail;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 }

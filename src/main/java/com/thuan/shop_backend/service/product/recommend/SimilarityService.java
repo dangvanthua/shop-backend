@@ -1,4 +1,4 @@
-package com.thuan.shop_backend.service.product;
+package com.thuan.shop_backend.service.product.recommend;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;

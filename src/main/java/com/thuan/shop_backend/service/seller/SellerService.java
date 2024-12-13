@@ -1,9 +1,9 @@
 package com.thuan.shop_backend.service.seller;
 
 import com.thuan.shop_backend.constant.PredefinedRole;
-import com.thuan.shop_backend.dto.request.PaymentInfoRequest;
-import com.thuan.shop_backend.dto.request.SellerRequest;
-import com.thuan.shop_backend.dto.response.SellerResponse;
+import com.thuan.shop_backend.dto.request.payment.PaymentInfoRequest;
+import com.thuan.shop_backend.dto.request.seller.SellerRequest;
+import com.thuan.shop_backend.dto.response.seller.SellerResponse;
 import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
@@ -27,23 +27,19 @@ public class SellerService implements ISellerService {
 
     @Override
     @Transactional
-    public SellerResponse createSeller(SellerRequest sellerRequest) {
+    public Seller createSeller(SellerRequest sellerRequest) {
 
         User user = userRepository.findById(sellerRequest.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (sellerRepository.existsByUserId(user.getId())) {
-            throw new AppException(ErrorCode.SELLER_ALREADY_EXISTS);
-        }
-
-        if (sellerRepository.existsByStoreName(sellerRequest.getStoreName())) {
-            throw new AppException(ErrorCode.STORE_NAME_ALREADY_EXISTS);
+        if (sellerRepository.existsByUserIdOrStoreName(user.getId(), sellerRequest.getStoreName())) {
+            throw new AppException(ErrorCode.SELLER_NOT_EXISTED);
         }
 
         Role sellerRole = roleRepository.findByName(PredefinedRole.SELLER.name())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
-        if (hasRole(user, PredefinedRole.SELLER.name())) {
+        if (!hasRole(user, PredefinedRole.SELLER.name())) {
             UserRole userRole = UserRole.builder()
                     .id(new UserRoleId(user.getId(), sellerRole.getId()))
                     .user(user)
@@ -62,7 +58,13 @@ public class SellerService implements ISellerService {
 
         if (sellerRequest.getPaymentInfo() != null) {
             PaymentInfoRequest paymentInfoRequest = sellerRequest.getPaymentInfo();
-            PaymentInfo paymentInfo = PaymentInfo.builder()
+
+            // Validate thông tin thanh toán
+            if (paymentInfoRequest.getAccountNumber() == null || paymentInfoRequest.getBankName() == null) {
+                throw new AppException(ErrorCode.INVALID_PAYMENT_INFO);
+            }
+
+            PaymentStore paymentInfo = PaymentStore.builder()
                     .seller(seller)
                     .accountName(paymentInfoRequest.getAccountName())
                     .accountNumber(paymentInfoRequest.getAccountNumber())
@@ -73,7 +75,7 @@ public class SellerService implements ISellerService {
             paymentInfoRepository.save(paymentInfo);
         }
 
-        return SellerResponse.fromSeller(seller);
+        return seller;
     }
 
     private boolean hasRole(User user, String roleName) {
@@ -92,7 +94,7 @@ public class SellerService implements ISellerService {
 
     @Override
     @Transactional
-    public SellerResponse updateSeller(SellerRequest sellerRequest) {
+    public Seller updateSeller(SellerRequest sellerRequest) {
 
         Seller seller = sellerRepository.findByUserId(sellerRequest.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
@@ -103,9 +105,8 @@ public class SellerService implements ISellerService {
         }
 
         seller.setStoreName(sellerRequest.getStoreName());
-        seller = sellerRepository.save(seller);
 
-        return SellerResponse.fromSeller(seller);
+        return sellerRepository.save(seller);
     }
 
     @Override

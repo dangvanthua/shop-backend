@@ -1,8 +1,9 @@
 package com.thuan.shop_backend.controller;
 
-import com.thuan.shop_backend.dto.request.SellerRequest;
+import com.thuan.shop_backend.dto.request.seller.SellerRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
-import com.thuan.shop_backend.dto.response.SellerResponse;
+import com.thuan.shop_backend.dto.response.seller.SellerResponse;
+import com.thuan.shop_backend.entity.Seller;
 import com.thuan.shop_backend.service.seller.ISellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,12 @@ public class SellerController {
     private final ISellerService sellerService;
 
     @PostMapping
-    public ApiResponse<SellerResponse> createSeller(
+    public ApiResponse<Seller> createSeller(
             @Valid @RequestBody SellerRequest sellerRequest) {
-        SellerResponse sellerResponse = sellerService.createSeller(sellerRequest);
-        return ApiResponse.<SellerResponse>builder()
+        Seller seller = sellerService.createSeller(sellerRequest);
+        return ApiResponse.<Seller>builder()
                 .message("Create seller success")
-                .result(sellerResponse)
+                .result(seller)
                 .build();
     }
 
@@ -37,12 +38,12 @@ public class SellerController {
     }
 
     @PutMapping
-    public ApiResponse<SellerResponse> updateSeller(
+    public ApiResponse<Seller> updateSeller(
             @Valid @RequestBody SellerRequest sellerRequest) {
-        SellerResponse sellerResponse = sellerService.updateSeller(sellerRequest);
-        return ApiResponse.<SellerResponse>builder()
+        Seller seller = sellerService.updateSeller(sellerRequest);
+        return ApiResponse.<Seller>builder()
                 .message("Update seller success")
-                .result(sellerResponse)
+                .result(seller)
                 .build();
     }
 

@@ -1,14 +1,20 @@
 package com.thuan.shop_backend.service.product;
 
 import com.thuan.shop_backend.constant.OrderStatus;
-import com.thuan.shop_backend.dto.request.ProdRecommendRequest;
-import com.thuan.shop_backend.dto.request.ProductRequest;
-import com.thuan.shop_backend.dto.response.*;
+import com.thuan.shop_backend.dto.request.product.ProdRecommendRequest;
+import com.thuan.shop_backend.dto.request.product.ProductRequest;
+import com.thuan.shop_backend.dto.response.product.ProductDetailResponse;
+import com.thuan.shop_backend.dto.response.product.ProductImageResponse;
+import com.thuan.shop_backend.dto.response.product.ProductResponse;
+import com.thuan.shop_backend.dto.response.promotion.PromotionCodeResponse;
+import com.thuan.shop_backend.dto.response.seller.SellerInfoResponse;
 import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.file.IFileService;
+import com.thuan.shop_backend.service.product.recommend.FeatureService;
+import com.thuan.shop_backend.service.product.recommend.SimilarityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +39,7 @@ public class ProductService implements IProductService{
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
     private final ReviewRepository reviewRepository;
+    private final ProductPromotionRepository promotionCodeRepository;
 
     private final IFileService fileService;
     private final FeatureService featureService;
@@ -40,7 +47,7 @@ public class ProductService implements IProductService{
 
     @Override
     @Transactional
-    public ProductResponse createProduct(ProductRequest productRequest) {
+    public Product createProduct(ProductRequest productRequest) {
 
         Seller seller = sellerRepository.findById(productRequest.getSellerId())
                 .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
@@ -58,9 +65,7 @@ public class ProductService implements IProductService{
                 .isActive(false)
                 .build();
 
-        product = productRepository.save(product);
-
-        return ProductResponse.fromProduct(product, null);
+        return productRepository.save(product);
     }
 
 
@@ -254,9 +259,47 @@ public class ProductService implements IProductService{
         long totalReviews = reviewRepository.countReviewsBySellerId(seller.getId());
 
         // Tạo thông tin người bán
-        SellerInfoResponse sellerInfo = SellerInfoResponse.fromSeller(seller, totalProductsSold, totalReviews);
+        SellerInfoResponse sellerInfo = SellerInfoResponse.fromSeller(
+                seller, totalProductsSold, totalReviews);
+
+        List<ProductPromotionCode> productPromotionCode = promotionCodeRepository
+                .findByProductId(product.getId());
+
+        List<PromotionCodeResponse> promotionCodeResponses = productPromotionCode.stream()
+                .map(PromotionCodeResponse::fromProductPromotion)
+                .toList();
 
         // Tạo response và trả về
-        return ProductDetailResponse.fromProductDetail(product, imageResponses, sellerInfo);
+        return ProductDetailResponse.fromProductDetail(
+                product,
+                imageResponses,
+                promotionCodeResponses,
+                sellerInfo);
+    }
+
+    @Override
+    @Transactional
+    public Product updateProduct(long productId, ProductRequest productRequest) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+
+        if(productRequest.getName() != null) {
+            product.setName(productRequest.getName());
+        }
+
+        if(productRequest.getDescription() != null) {
+            product.setDescription(productRequest.getDescription());
+        }
+
+        if(productRequest.getPrice() > 0) {
+            product.setPrice(productRequest.getPrice());
+        }
+
+        if(productRequest.getQuantity() > 0) {
+            product.setQuantity(productRequest.getQuantity());
+        }
+
+        return productRepository.save(product);
     }
 }

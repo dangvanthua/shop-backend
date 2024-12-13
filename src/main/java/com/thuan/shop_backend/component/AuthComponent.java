@@ -1,12 +1,15 @@
-package com.thuan.shop_backend.utils;
+package com.thuan.shop_backend.component;
 
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
-public class InfoAuthentication {
-    public static String getEmailFromAuthentication() {
+@Component
+public class AuthComponent {
+
+    public String getEmailFromAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && authentication.isAuthenticated()) {
             return authentication.getName();

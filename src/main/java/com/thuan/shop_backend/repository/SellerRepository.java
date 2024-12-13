@@ -8,10 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface SellerRepository extends JpaRepository<Seller, Long> {
-    @Query("SELECT COUNT(s) > 0 FROM Seller s WHERE s.user.id = :userId")
-    boolean existsByUserId(@Param("userId") Long userId);
-
-    boolean existsByStoreName(String storeName);
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Seller s WHERE s.user.id = :userId OR s.storeName = :storeName")
+    boolean existsByUserIdOrStoreName(@Param("userId") Long userId, @Param("storeName") String storeName);
 
     @Query("SELECT s FROM Seller s WHERE s.user.id = :userId")
     Optional<Seller> findByUserId(@Param("userId") long userId);
@@ -21,4 +20,6 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     @Query("SELECT COUNT(p) FROM Product p WHERE p.seller.id = :sellerId")
     Long countProductsSoldBySeller(@Param("sellerId") long sellerId);
+
+    boolean existsByStoreName(String storeName);
 }

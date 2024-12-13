@@ -1,4 +1,4 @@
-package com.thuan.shop_backend.dto.request;
+package com.thuan.shop_backend.dto.request.promotion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thuan.shop_backend.constant.DiscountType;
@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @AllArgsConstructor

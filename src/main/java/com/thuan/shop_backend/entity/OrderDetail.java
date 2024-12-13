@@ -24,7 +24,7 @@ public class OrderDetail {
     private Product product;
 
     @Column(name = "price")
-    private Float price;
+    private Double price;
 
     @Column(name = "number_of_products")
     private Integer numberOfProducts;

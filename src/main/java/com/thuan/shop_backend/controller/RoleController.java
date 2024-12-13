@@ -1,8 +1,9 @@
 package com.thuan.shop_backend.controller;
 
-import com.thuan.shop_backend.dto.request.RoleRequest;
+import com.thuan.shop_backend.dto.request.role.RoleRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
-import com.thuan.shop_backend.dto.response.RoleResponse;
+import com.thuan.shop_backend.dto.response.role.RoleResponse;
+import com.thuan.shop_backend.entity.Role;
 import com.thuan.shop_backend.service.role.IRoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,12 @@ public class RoleController {
     private final IRoleService roleService;
 
     @PostMapping
-    public ApiResponse<RoleResponse> createRole(
+    public ApiResponse<Role> createRole(
             @Valid @RequestBody RoleRequest request) {
-        RoleResponse roleResponse = roleService.createRole(request);
-        return ApiResponse.<RoleResponse>builder()
+        Role role = roleService.createRole(request);
+        return ApiResponse.<Role>builder()
                 .message("Create role success")
-                .result(roleResponse)
+                .result(role)
                 .build();
     }
 
@@ -46,13 +47,13 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<RoleResponse> updateRole(
+    public ApiResponse<Role> updateRole(
             @PathVariable("id") long roleId,
             @Valid @RequestBody RoleRequest roleRequest) {
-        RoleResponse roleResponse = roleService.updateRole(roleId, roleRequest);
-        return ApiResponse.<RoleResponse>builder()
+        Role role = roleService.updateRole(roleId, roleRequest);
+        return ApiResponse.<Role>builder()
                 .message("Update role success")
-                .result(roleResponse)
+                .result(role)
                 .build();
     }
 

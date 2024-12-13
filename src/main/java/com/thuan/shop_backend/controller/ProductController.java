@@ -1,11 +1,12 @@
 package com.thuan.shop_backend.controller;
 
 import com.thuan.shop_backend.component.FilePathComponent;
-import com.thuan.shop_backend.dto.request.ProductRequest;
+import com.thuan.shop_backend.dto.request.product.ProductRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
-import com.thuan.shop_backend.dto.response.ProductDetailResponse;
-import com.thuan.shop_backend.dto.response.ProductListResponse;
-import com.thuan.shop_backend.dto.response.ProductResponse;
+import com.thuan.shop_backend.dto.response.product.ProductDetailResponse;
+import com.thuan.shop_backend.dto.response.product.ProductListResponse;
+import com.thuan.shop_backend.dto.response.product.ProductResponse;
+import com.thuan.shop_backend.entity.Product;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.service.file.IFileService;
@@ -35,7 +36,8 @@ public class ProductController {
     @PostMapping
     public ApiResponse<ProductResponse> createProduct(
             @Valid @RequestBody ProductRequest productRequest) {
-        ProductResponse productResponse = productService.createProduct(productRequest);
+        Product product = productService.createProduct(productRequest);
+        ProductResponse productResponse = ProductResponse.fromProduct(product, null);
         return ApiResponse.<ProductResponse>builder()
                 .message("Create product success")
                 .result(productResponse)

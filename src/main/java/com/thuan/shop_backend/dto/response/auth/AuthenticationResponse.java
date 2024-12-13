@@ -1,4 +1,4 @@
-package com.thuan.shop_backend.dto.response;
+package com.thuan.shop_backend.dto.response.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

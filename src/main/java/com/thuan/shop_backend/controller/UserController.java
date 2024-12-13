@@ -1,9 +1,10 @@
 package com.thuan.shop_backend.controller;
 
 import com.thuan.shop_backend.component.FilePathComponent;
-import com.thuan.shop_backend.dto.request.UserCreateRequest;
+import com.thuan.shop_backend.dto.request.user.UserCreateRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
-import com.thuan.shop_backend.dto.response.UserResponse;
+import com.thuan.shop_backend.dto.response.user.UserResponse;
+import com.thuan.shop_backend.entity.User;
 import com.thuan.shop_backend.service.file.IFileService;
 import com.thuan.shop_backend.service.user.IUserService;
 import jakarta.validation.Valid;
@@ -24,12 +25,12 @@ public class UserController {
     private final FilePathComponent filePathComponent;
 
     @PostMapping
-    public ApiResponse<UserResponse> createUser(
+    public ApiResponse<User> createUser(
             @Valid @RequestBody UserCreateRequest userCreateRequest) {
-        UserResponse userResponse = userService.createUser(userCreateRequest);
-        return ApiResponse.<UserResponse>builder()
+        User user = userService.createUser(userCreateRequest);
+        return ApiResponse.<User>builder()
                 .message("Create user success")
-                .result(userResponse)
+                .result(user)
                 .build();
     }
 
@@ -52,13 +53,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<UserResponse> updateUser(
+    public ApiResponse<User> updateUser(
             @PathVariable("id") long userId,
             UserCreateRequest userCreateRequest) {
-        UserResponse userResponse = userService.updateUser(userId, userCreateRequest);
-        return ApiResponse.<UserResponse>builder()
+        User user = userService.updateUser(userId, userCreateRequest);
+        return ApiResponse.<User>builder()
                 .message("Update user success")
-                .result(userResponse)
+                .result(user)
                 .build();
     }
 

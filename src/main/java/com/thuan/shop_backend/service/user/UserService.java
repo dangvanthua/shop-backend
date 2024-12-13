@@ -1,8 +1,8 @@
 package com.thuan.shop_backend.service.user;
 
 import com.thuan.shop_backend.constant.PredefinedRole;
-import com.thuan.shop_backend.dto.request.UserCreateRequest;
-import com.thuan.shop_backend.dto.response.UserResponse;
+import com.thuan.shop_backend.dto.request.user.UserCreateRequest;
+import com.thuan.shop_backend.dto.response.user.UserResponse;
 import com.thuan.shop_backend.entity.Role;
 import com.thuan.shop_backend.entity.User;
 import com.thuan.shop_backend.entity.UserRole;
@@ -32,7 +32,7 @@ public class UserService implements IUserService{
 
     @Override
     @Transactional
-    public UserResponse createUser(UserCreateRequest userCreateRequest) {
+    public User createUser(UserCreateRequest userCreateRequest) {
 
         validateUserUniqueness(userCreateRequest.getEmail(), userCreateRequest.getPhoneNumber());
 
@@ -59,9 +59,10 @@ public class UserService implements IUserService{
                 .build();
 
         userRole = userRoleRepository.save(userRole);
+
         user.setRole(List.of(userRole));
 
-        return UserResponse.fromUser(user);
+        return user;
     }
 
     @Override
@@ -81,7 +82,7 @@ public class UserService implements IUserService{
 
     @Override
     @Transactional
-    public UserResponse updateUser(
+    public User updateUser(
             long userId,
             UserCreateRequest userCreateRequest) {
 
@@ -116,9 +117,7 @@ public class UserService implements IUserService{
             user.setDateOfBirth(userCreateRequest.getDateOfBirth());
         }
 
-        user = userRepository.save(user);
-
-        return UserResponse.fromUser(user);
+        return userRepository.save(user);
     }
 
     @Override

@@ -1,6 +1,6 @@
-package com.thuan.shop_backend.service.product;
+package com.thuan.shop_backend.service.product.recommend;
 
-import com.thuan.shop_backend.dto.request.ProdRecommendRequest;
+import com.thuan.shop_backend.dto.request.product.ProdRecommendRequest;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import org.springframework.stereotype.Service;

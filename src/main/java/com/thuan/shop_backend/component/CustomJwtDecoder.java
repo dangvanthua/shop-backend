@@ -1,7 +1,7 @@
 package com.thuan.shop_backend.component;
 
 import com.nimbusds.jose.JOSEException;
-import com.thuan.shop_backend.dto.request.IntrospectRequest;
+import com.thuan.shop_backend.dto.request.auth.IntrospectRequest;
 import com.thuan.shop_backend.service.auth.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

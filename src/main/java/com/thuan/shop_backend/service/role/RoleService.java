@@ -1,7 +1,7 @@
 package com.thuan.shop_backend.service.role;
 
-import com.thuan.shop_backend.dto.request.RoleRequest;
-import com.thuan.shop_backend.dto.response.RoleResponse;
+import com.thuan.shop_backend.dto.request.role.RoleRequest;
+import com.thuan.shop_backend.dto.response.role.RoleResponse;
 import com.thuan.shop_backend.entity.Permission;
 import com.thuan.shop_backend.entity.Role;
 import com.thuan.shop_backend.entity.RolePermission;
@@ -28,7 +28,7 @@ public class RoleService implements IRoleService{
 
     @Override
     @Transactional
-    public RoleResponse createRole(RoleRequest request) {
+    public Role createRole(RoleRequest request) {
 
         if(roleRepository.existsByName(request.getName())) {
             throw new AppException(ErrorCode.ROLE_EXISTED);
@@ -65,7 +65,7 @@ public class RoleService implements IRoleService{
 
         rolePermissionRepository.saveAll(rolePermissions);
 
-        return RoleResponse.fromRole(role);
+       return role;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class RoleService implements IRoleService{
 
     @Override
     @Transactional
-    public RoleResponse updateRole(long roleId, RoleRequest roleRequest) {
+    public Role updateRole(long roleId, RoleRequest roleRequest) {
 
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
@@ -128,9 +128,7 @@ public class RoleService implements IRoleService{
             rolePermissionRepository.saveAll(rolePermissions);
         }
 
-        role = roleRepository.save(role);
-
-        return RoleResponse.fromRole(role);
+        return roleRepository.save(role);
     }
 
     @Override

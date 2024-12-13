@@ -1,12 +1,11 @@
 package com.thuan.shop_backend.service.permission;
 
-import com.thuan.shop_backend.dto.request.PermissionRequest;
-import com.thuan.shop_backend.dto.response.PermissionResponse;
+import com.thuan.shop_backend.dto.request.permission.PermissionRequest;
+import com.thuan.shop_backend.dto.response.permisson.PermissionResponse;
 import com.thuan.shop_backend.entity.Permission;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.PermissionRepository;
-import com.thuan.shop_backend.repository.RolePermissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class PermissionService implements IPermissionService {
     private final PermissionRepository permissionRepository;
 
     @Override
-    public PermissionResponse createPermission(PermissionRequest permissionRequest) {
+    public Permission createPermission(PermissionRequest permissionRequest) {
 
         boolean existPermission = permissionRepository.existsByName(permissionRequest.getName());
 
@@ -30,9 +29,8 @@ public class PermissionService implements IPermissionService {
         }
 
         Permission permission = mapper.map(permissionRequest, Permission.class);
-        permission = permissionRepository.save(permission);
 
-        return PermissionResponse.fromPermission(permission);
+        return permissionRepository.save(permission);
     }
 
     @Override
@@ -55,7 +53,7 @@ public class PermissionService implements IPermissionService {
     }
 
     @Override
-    public PermissionResponse updatePermission(long permissionId, PermissionRequest permissionRequest) {
+    public Permission updatePermission(long permissionId, PermissionRequest permissionRequest) {
 
         Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_EXISTED));
@@ -63,9 +61,7 @@ public class PermissionService implements IPermissionService {
         permission.setName(permissionRequest.getName());
         permission.setDescription(permissionRequest.getDescription());
 
-        permission = permissionRepository.save(permission);
-
-        return PermissionResponse.fromPermission(permission);
+        return permissionRepository.save(permission);
     }
 
     @Override

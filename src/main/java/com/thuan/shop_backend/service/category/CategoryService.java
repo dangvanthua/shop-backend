@@ -1,7 +1,7 @@
 package com.thuan.shop_backend.service.category;
 
-import com.thuan.shop_backend.dto.request.CategoryRequest;
-import com.thuan.shop_backend.dto.response.CategoryResponse;
+import com.thuan.shop_backend.dto.request.category.CategoryRequest;
+import com.thuan.shop_backend.dto.response.category.CategoryResponse;
 import com.thuan.shop_backend.entity.Category;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
@@ -22,7 +22,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     @Transactional
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+    public Category createCategory(CategoryRequest categoryRequest) {
 
         boolean isCategoryExist = categoryRepository.existsByName(categoryRequest.getName());
 
@@ -37,13 +37,9 @@ public class CategoryService implements ICategoryService {
         Optional<Category> parentCategory = categoryRepository.findById(
                 categoryRequest.getParentId());
 
-        if(parentCategory.isPresent()) {
-            category.setParent(parentCategory.get());
-        }
+        parentCategory.ifPresent(category::setParent);
 
-        category = categoryRepository.save(category);
-
-        return CategoryResponse.fromCategory(category);
+        return categoryRepository.save(category);
     }
 
     @Override
@@ -71,7 +67,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     @Transactional
-    public CategoryResponse updateCategory(
+    public Category updateCategory(
             long categoryId,
             CategoryRequest categoryRequest) {
 
@@ -99,10 +95,7 @@ public class CategoryService implements ICategoryService {
         }
 
         // update category
-        category = categoryRepository.save(category);
-
-        // return category response
-        return CategoryResponse.fromCategory(category);
+        return categoryRepository.save(category);
     }
 
     @Override

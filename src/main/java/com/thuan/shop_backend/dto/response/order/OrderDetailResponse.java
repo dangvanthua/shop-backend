@@ -1,6 +1,7 @@
-package com.thuan.shop_backend.dto.response;
+package com.thuan.shop_backend.dto.response.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thuan.shop_backend.dto.response.product.ProductResponse;
 import com.thuan.shop_backend.entity.OrderDetail;
 import com.thuan.shop_backend.entity.ProductImage;
 import lombok.AllArgsConstructor;

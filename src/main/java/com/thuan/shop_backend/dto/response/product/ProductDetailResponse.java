@@ -1,6 +1,8 @@
-package com.thuan.shop_backend.dto.response;
+package com.thuan.shop_backend.dto.response.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thuan.shop_backend.dto.response.promotion.PromotionCodeResponse;
+import com.thuan.shop_backend.dto.response.seller.SellerInfoResponse;
 import com.thuan.shop_backend.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
