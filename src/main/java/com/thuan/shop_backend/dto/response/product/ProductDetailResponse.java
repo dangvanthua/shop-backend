@@ -38,9 +38,13 @@ public class ProductDetailResponse {
     @JsonProperty("seller_info")
     private SellerInfoResponse sellerInfo;
 
+    @JsonProperty("promotion_codes")
+    private List<PromotionCodeResponse> promotionCodes;
+
     public static ProductDetailResponse fromProductDetail(
             Product product,
             List<ProductImageResponse> imageUrls,
+            List<PromotionCodeResponse> promotionCodes,
             SellerInfoResponse sellerInfo) {
 
         return ProductDetailResponse.builder()
@@ -52,6 +56,7 @@ public class ProductDetailResponse {
                 .isActive(product.getIsActive())
                 .imageUrls(imageUrls)
                 .sellerInfo(sellerInfo)
+                .promotionCodes(promotionCodes)
                 .build();
     }
 }
