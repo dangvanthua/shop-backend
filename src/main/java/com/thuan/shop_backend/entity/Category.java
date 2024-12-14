@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners(CategoryListener.class)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +37,4 @@ public class Category {
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }

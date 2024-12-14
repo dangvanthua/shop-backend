@@ -1,9 +1,11 @@
 package com.thuan.shop_backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.thuan.shop_backend.dto.request.category.CategoryRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
 import com.thuan.shop_backend.dto.response.category.CategoryResponse;
 import com.thuan.shop_backend.entity.Category;
+import com.thuan.shop_backend.service.category.ICategoryRedisService;
 import com.thuan.shop_backend.service.category.ICategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 public class CategoryController {
 
     private final ICategoryService categoryService;
+    private final ICategoryRedisService categoryRedisService;
 
     @PostMapping
     public ApiResponse<Category> createCategory(
@@ -29,8 +32,19 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ApiResponse<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categoryResponses = categoryService.getAllCategories();
+    public ApiResponse<List<CategoryResponse>> getAllCategories() throws JsonProcessingException {
+        // Lay danh sach danh muc tu redis
+        List<CategoryResponse> categoryResponses = null;
+
+        categoryResponses = categoryRedisService.getCategoriesFromCache();
+
+        if(categoryResponses == null) {
+            // lay du lieu tu category db
+            categoryResponses = categoryService.getAllCategories();
+            // luu category xuong redis
+            categoryRedisService.saveCategoriesToCache(categoryResponses);
+        }
+
         return ApiResponse.<List<CategoryResponse>>builder()
                 .message("Get all categories success")
                 .result(categoryResponses)

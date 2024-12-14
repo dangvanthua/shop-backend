@@ -14,10 +14,6 @@ import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +48,7 @@ public class OrderService implements IOrderService{
 
         Order order = mapper.map(orderRequest, Order.class);
         order.setPaymentMethod(orderRequest.getPaymentMethod().name().toLowerCase());
+        order.setShippingMethod(orderRequest.getShippingMethod().name().toLowerCase());
         order.setUser(user);
         order.setOrderDate(LocalDate.now());
         order.setStatus(OrderStatus.PENDING);

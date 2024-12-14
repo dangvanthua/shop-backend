@@ -1,5 +1,6 @@
 package com.thuan.shop_backend.service.product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.thuan.shop_backend.constant.OrderStatus;
 import com.thuan.shop_backend.dto.request.product.ProdRecommendRequest;
 import com.thuan.shop_backend.dto.request.product.ProductRequest;
@@ -17,12 +18,14 @@ import com.thuan.shop_backend.service.product.recommend.FeatureService;
 import com.thuan.shop_backend.service.product.recommend.SimilarityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import weka.core.Instances;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,7 @@ public class ProductService implements IProductService{
     private final IFileService fileService;
     private final FeatureService featureService;
     private final SimilarityService similarityService;
+    private final IProductRedisService productRedisService;
 
     @Override
     @Transactional
@@ -211,6 +215,7 @@ public class ProductService implements IProductService{
 
     @Override
     public Page<ProductResponse> getFeatureProducts(int page, int size) {
+
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Product> productPage = productRepository.findProductsByTopSelling(OrderStatus.DELIVERED, pageable);
@@ -233,6 +238,10 @@ public class ProductService implements IProductService{
             List<ProductImage> productImages = imagesGroupedByProduct.getOrDefault(product.getId(), Collections.emptyList());
             return ProductResponse.fromProduct(product, productImages);
         });
+    }
+
+    private List<ProductImage> getImagesForProduct(Long productId) {
+        return productImageRepository.findByProductIds(List.of(productId));
     }
 
     @Override
