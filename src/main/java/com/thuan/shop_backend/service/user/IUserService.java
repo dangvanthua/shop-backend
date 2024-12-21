@@ -14,4 +14,6 @@ public interface IUserService {
     void deactivateUser(long userId);
     void deleteUser(long userId);
     void uploadAvatarUser(long userId, String publicId, String avatarUrl);
+    User getUserByEmail(String email);
+    UserResponse getUserDetail();
 }

@@ -1,5 +1,6 @@
 package com.thuan.shop_backend.service.user;
 
+import com.thuan.shop_backend.component.AuthComponent;
 import com.thuan.shop_backend.constant.PredefinedRole;
 import com.thuan.shop_backend.dto.request.user.UserCreateRequest;
 import com.thuan.shop_backend.dto.response.user.UserResponse;
@@ -29,6 +30,7 @@ public class UserService implements IUserService{
     private final RoleRepository roleRepository;
     private final IFileService fileService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthComponent authComponent;
 
     @Override
     @Transactional
@@ -155,6 +157,19 @@ public class UserService implements IUserService{
         user.setAvatarPublicId(publicId);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
+    @Override
+    public UserResponse getUserDetail() {
+        String email = authComponent.getEmailFromAuthentication();
+        User user = getUserByEmail(email);
+        return UserResponse.fromUser(user);
     }
 
     private void validateUserUniqueness(String email, String phoneNumber) {

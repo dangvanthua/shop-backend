@@ -19,7 +19,7 @@ import java.text.ParseException;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class AuthController {
 
     private final IAuthService authService;
 

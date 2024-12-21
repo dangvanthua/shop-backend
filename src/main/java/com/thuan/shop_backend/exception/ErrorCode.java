@@ -52,7 +52,9 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS(1042, "Invalid order status", HttpStatus.BAD_REQUEST),
     INSUFFICIENT_STOCK(1043, "Product insufficient stock", HttpStatus.INSUFFICIENT_STORAGE),
     WRITE_REDIS_FAILED(1044, "Write value into cache failed", HttpStatus.BAD_REQUEST),
-    READ_REDIS_FAILED(1045, "Read value from cache failed", HttpStatus.BAD_REQUEST);
+    READ_REDIS_FAILED(1045, "Read value from cache failed", HttpStatus.BAD_REQUEST),
+    INVALID_QUANTITY(1046, "Quantity must be greater than 0 and less than quantity product", HttpStatus.BAD_REQUEST),
+    CART_NOT_EXISTED(1047, "Cart not existed", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

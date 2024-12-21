@@ -16,6 +16,16 @@ import java.util.*;
 public class FeatureService {
     private final Map<String, Integer> productIndexMap = new HashMap<>();
 
+    private String cleanText(String text) {
+        if(text == null) {
+            return "unknown";
+        }
+        return text.trim()
+                .toLowerCase()
+                .replaceAll("[^a-zA-Z0-9\\s]", "")
+                .replaceAll("\\s+", " ");
+    }
+
     public Instances prepareTFIDFeatures(List<ProdRecommendRequest> prodRecommendRequests) throws Exception {
         ArrayList<Attribute> attributes = new ArrayList<>();
 
@@ -43,9 +53,9 @@ public class FeatureService {
             instance.setDataset(data);
 
             // Gán giá trị cho thuộc tính chuỗi
-            instance.setValue(nameAttr, product.getName());
-            instance.setValue(descAttr, descAttr.addStringValue(product.getDescription()));
-            instance.setValue(categoryAttr, categoryAttr.addStringValue(product.getCategoryName()));
+            instance.setValue(nameAttr, cleanText(product.getName()));
+            instance.setValue(descAttr, descAttr.addStringValue(cleanText(product.getDescription())));
+            instance.setValue(categoryAttr, categoryAttr.addStringValue(cleanText(product.getCategoryName())));
 
             // Gán giá trị cho thuộc tính số
             instance.setValue(priceAttr, product.getPrice());

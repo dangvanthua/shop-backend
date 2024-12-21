@@ -11,7 +11,9 @@ import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
+import com.thuan.shop_backend.service.cart.ICartService;
 import com.thuan.shop_backend.service.product.IProductService;
+import com.thuan.shop_backend.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +30,6 @@ public class OrderService implements IOrderService{
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
-    private final UserRepository userRepository;
     private final PromotionCodeRepository promotionCodeRepository;
     private final ProductPromotionRepository productPromotionRepository;
     private final ProductRepository productRepository;
@@ -36,6 +37,8 @@ public class OrderService implements IOrderService{
     private final ModelMapper mapper;
 
     private final IProductService productService;
+    private final IUserService userService;
+    private final ICartService cartService;
 
     @Override
     @Transactional
@@ -43,8 +46,7 @@ public class OrderService implements IOrderService{
 
         String email = authComponent.getEmailFromAuthentication();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userService.getUserByEmail(email);
 
         Order order = mapper.map(orderRequest, Order.class);
         order.setPaymentMethod(orderRequest.getPaymentMethod().name().toLowerCase());
@@ -107,6 +109,9 @@ public class OrderService implements IOrderService{
             // luu chi tiet don hang
             orderDetailRepository.save(orderDetail);
 
+            // xoa san pham trong gio hang
+            cartService.removeCartItem(product.getId());
+
             // cap nhat lai so luong cua san pham
             ProductRequest productRequest = ProductRequest.builder()
                     .quantity(product.getQuantity() - cartItem.getQuantity())
@@ -129,8 +134,7 @@ public class OrderService implements IOrderService{
         // Lay thong tin cua user
         String email = authComponent.getEmailFromAuthentication();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userService.getUserByEmail(email);
 
         if(!Objects.equals(order.getUser().getId(), user.getId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);

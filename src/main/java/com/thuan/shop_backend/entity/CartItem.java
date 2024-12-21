@@ -2,7 +2,9 @@ package com.thuan.shop_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -12,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Cart {
+public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +31,6 @@ public class Cart {
     private Integer quantity;
 
     @Column(name = "added_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date addedAt;
+    @CreationTimestamp
+    private LocalDate addedAt;
 }
