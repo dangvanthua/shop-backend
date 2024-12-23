@@ -14,5 +14,6 @@ public class AuthenticationRequest {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
+    private String email;
     private String password;
 }

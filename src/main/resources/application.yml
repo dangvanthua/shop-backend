@@ -31,6 +31,19 @@ spring:
     password:
     timeout: 10000
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 311188236269-upt13pv1tadijt9f91ck9rgonnofbsbl.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: http://localhost:4200/auth/google/callback
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            resource-server:
+              opaque-token:
+                introspection-uri: "https://googleapis.com"
+
 jwt:
   signerKey: XcZY99Tw3J9fiSQYbZEIAi2JTfifpUolb2+/3AvVPveVK0or6PJ418iY71DvyUa1
   valid-duration: 1800
@@ -52,4 +65,9 @@ file:
       image: ecommerce/reviews/images/
       video: ecommerce/reviews/videos/
 
+paypal:
+  client-id: AXspccyg2oC5Xr8-yRbHU_0x2QUVph8hk51I-zUW81ma8HvGtFc0REu-WE0P4WFpnZZmkH3z6XT3Fowh
+  client-secret: ECSSSlU8ocuKfxBgDeVa5gBmPO92IfL0ElxA4HRn2GoWFXzbhf9E0Tpd8iECQWtcvpdFPrTrpr6z5oBG
+  api:
+    base-url: https://api-m.sandbox.paypal.com
 

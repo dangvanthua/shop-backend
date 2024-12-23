@@ -7,10 +7,14 @@ import com.thuan.shop_backend.dto.request.auth.RefreshRequest;
 import com.thuan.shop_backend.dto.response.auth.AuthenticationResponse;
 import com.thuan.shop_backend.dto.response.auth.IntrospectResponse;
 
+import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 
 public interface IAuthService {
     IntrospectResponse introspect(IntrospectRequest introspectRequest) throws ParseException, JOSEException;
-    AuthenticationResponse authenticate(AuthenticationRequest auth);
+    AuthenticationResponse authenticate(AuthenticationRequest auth, boolean isSocialAccount);
     AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException;
+    String generateAuthUrl(String loginType);
+    Map<String, Object> authenticationAndFetchProfile(String code, String loginType) throws IOException;
 }

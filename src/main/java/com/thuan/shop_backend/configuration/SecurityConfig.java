@@ -27,12 +27,14 @@ public class SecurityConfig {
             "/auth/token",
             "/auth/introspect",
             "/auth/logout",
-            "/auth/refresh"
+            "/auth/refresh",
     };
 
     private final String[] PUBLIC_ENDPOINT_GET = {
             "/categories/**",
-            "/products/**"
+            "/products/**",
+            "/auth/social-login",
+            "/auth/social/callback"
     };
 
     @Autowired

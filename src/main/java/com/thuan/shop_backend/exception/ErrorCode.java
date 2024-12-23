@@ -54,7 +54,8 @@ public enum ErrorCode {
     WRITE_REDIS_FAILED(1044, "Write value into cache failed", HttpStatus.BAD_REQUEST),
     READ_REDIS_FAILED(1045, "Read value from cache failed", HttpStatus.BAD_REQUEST),
     INVALID_QUANTITY(1046, "Quantity must be greater than 0 and less than quantity product", HttpStatus.BAD_REQUEST),
-    CART_NOT_EXISTED(1047, "Cart not existed", HttpStatus.NOT_FOUND);
+    CART_NOT_EXISTED(1047, "Cart not existed", HttpStatus.NOT_FOUND),
+    PAYMENT_FAILED(1048, "Payment is failed", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

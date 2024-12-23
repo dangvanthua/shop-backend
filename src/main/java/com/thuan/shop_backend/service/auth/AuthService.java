@@ -1,5 +1,11 @@
 package com.thuan.shop_backend.service.auth;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -18,25 +24,24 @@ import com.thuan.shop_backend.repository.RolePermissionRepository;
 import com.thuan.shop_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService{
 
     private final UserRepository userRepository;
-    private final PermissionRepository permissionRepository;
-    private final RolePermissionRepository rolePermissionRepository;
 
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
@@ -47,6 +52,17 @@ public class AuthService implements IAuthService{
     @Value("${jwt.refresh-duration}")
     protected long REFRESHABLE_DURATION;
 
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String googleClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String googleRedirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.google.user-info-uri}")
+    private String googleUserInfoUri;
 
     @Override
     public IntrospectResponse introspect(IntrospectRequest introspectRequest) throws ParseException, JOSEException {
@@ -87,17 +103,24 @@ public class AuthService implements IAuthService{
     }
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest auth) {
+    public AuthenticationResponse authenticate(AuthenticationRequest auth, boolean isSocialAccount) {
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        User user = null;
 
-        User user = userRepository.findByPhoneNumber(auth.getPhoneNumber())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(!isSocialAccount) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        boolean authenticated = passwordEncoder.matches(auth.getPassword(), user.getPassword());
+            user = userRepository.findByPhoneNumber(auth.getPhoneNumber())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if(!authenticated) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            boolean authenticated = passwordEncoder.matches(auth.getPassword(), user.getPassword());
+
+            if(!authenticated) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+        }else {
+            user = userRepository.findByEmail(auth.getEmail())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         }
 
         String token = generateToken(user);
@@ -121,6 +144,58 @@ public class AuthService implements IAuthService{
                 .token(token)
                 .authenticated(true)
                 .build();
+    }
+
+    @Override
+    public String generateAuthUrl(String loginType) {
+        String url = "";
+        loginType = loginType.trim().toLowerCase();
+
+        if("google".equals(loginType)) {
+            GoogleAuthorizationCodeRequestUrl urlBuilder = new GoogleAuthorizationCodeRequestUrl(
+                    googleClientId,
+                    googleRedirectUri,
+                    Arrays.asList("email", "profile", "openid"));
+            url = urlBuilder.build();
+        }else if("facebook".equals(loginType)) {
+            // this code will implement
+        }
+
+        return url;
+    }
+
+    @Override
+    public Map<String, Object> authenticationAndFetchProfile(
+            String code,
+            String loginType) throws IOException {
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        String accessToken;
+
+        switch (loginType.toLowerCase()) {
+            case "google":
+                accessToken = new GoogleAuthorizationCodeTokenRequest(
+                        new NetHttpTransport(), new GsonFactory(),
+                        googleClientId,
+                        googleClientSecret,
+                        code,
+                        googleRedirectUri
+                ).execute().getAccessToken();
+
+                restTemplate.getInterceptors().add((req, body, executionContext) -> {
+                   req.getHeaders().set("Authorization", "Bearer " + accessToken);
+                   return executionContext.execute(req, body);
+                });
+
+                return new ObjectMapper().readValue(
+                        restTemplate.getForEntity(googleUserInfoUri, String.class).getBody(),
+                        new TypeReference<>() {});
+
+            case "facebook":
+            default:
+                return null;
+        }
     }
 
     private String generateToken(User user) {

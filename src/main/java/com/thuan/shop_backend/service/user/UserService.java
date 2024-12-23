@@ -2,15 +2,15 @@ package com.thuan.shop_backend.service.user;
 
 import com.thuan.shop_backend.component.AuthComponent;
 import com.thuan.shop_backend.constant.PredefinedRole;
+import com.thuan.shop_backend.constant.ProviderType;
 import com.thuan.shop_backend.dto.request.user.UserCreateRequest;
+import com.thuan.shop_backend.dto.request.user.UserLoginRequest;
 import com.thuan.shop_backend.dto.response.user.UserResponse;
-import com.thuan.shop_backend.entity.Role;
-import com.thuan.shop_backend.entity.User;
-import com.thuan.shop_backend.entity.UserRole;
-import com.thuan.shop_backend.entity.UserRoleId;
+import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.RoleRepository;
+import com.thuan.shop_backend.repository.SocialAccountRepository;
 import com.thuan.shop_backend.repository.UserRepository;
 import com.thuan.shop_backend.repository.UserRoleRepository;
 import com.thuan.shop_backend.service.file.IFileService;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class UserService implements IUserService{
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
+    private final SocialAccountRepository socialAccountRepository;
     private final IFileService fileService;
     private final PasswordEncoder passwordEncoder;
     private final AuthComponent authComponent;
@@ -63,6 +65,64 @@ public class UserService implements IUserService{
         userRole = userRoleRepository.save(userRole);
 
         user.setRole(List.of(userRole));
+
+        return user;
+    }
+
+    @Override
+    @Transactional
+    public User createUserSocialAccount(UserLoginRequest userLoginRequest) {
+
+        Optional<User> userOptional = userRepository.findByEmail(userLoginRequest.getEmail());
+
+        if(userOptional.isPresent()) {
+            return userOptional.get();
+        }
+
+        Role role = roleRepository.findByName(PredefinedRole.USER.name())
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+
+        User user = User.builder()
+                .fullName(userLoginRequest.getFullName())
+                .email(userLoginRequest.getEmail())
+                .avatar(userLoginRequest.getPicture())
+                .isActive(true)
+                .build();
+
+        user = userRepository.save(user);
+
+        UserRoleId userRoleId = new UserRoleId(user.getId(), role.getId());
+
+        UserRole userRole = UserRole.builder()
+                .id(userRoleId)
+                .role(role)
+                .user(user)
+                .build();
+        userRole = userRoleRepository.save(userRole);
+
+        user.setRole(List.of(userRole));
+
+        if(socialAccountRepository.existsByProviderId(userLoginRequest.getProviderId())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        String providerName = "";
+
+        if(userLoginRequest.getProviderName()
+                .equals(ProviderType.GOOGLE.name().toLowerCase())) {
+            providerName = ProviderType.GOOGLE.name();
+        } else if (userLoginRequest.getProviderName()
+                .equals(ProviderType.FACEBOOK.name().toLowerCase())) {
+            providerName = ProviderType.FACEBOOK.name();
+        }
+
+        SocialAccount socialAccount = SocialAccount.builder()
+                .provider(providerName)
+                .providerId(userLoginRequest.getProviderId())
+                .user(user)
+                .build();
+
+        socialAccountRepository.save(socialAccount);
 
         return user;
     }

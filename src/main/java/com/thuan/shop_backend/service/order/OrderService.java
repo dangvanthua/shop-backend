@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -165,7 +164,6 @@ public class OrderService implements IOrderService{
             case PROCESSING -> newStatus == OrderStatus.SHIPPED || newStatus == OrderStatus.CANCELLED;
             case SHIPPED -> newStatus == OrderStatus.DELIVERED;
             case DELIVERED, CANCELLED -> false;
-            default -> false;
         };
     }
 }
