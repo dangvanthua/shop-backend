@@ -43,6 +43,16 @@ spring:
             resource-server:
               opaque-token:
                 introspection-uri: "https://googleapis.com"
+          facebook:
+            client-id: 1117747529980605
+            client-secret: 49617d581207fdcb221a2f3fea439e67
+            redirect-uri: http://localhost:4200/auth/facebook/callback
+            auth-uri: https://www.facebook.com/v21.0/dialog/oauth
+            token-uri: https://graph.facebook.com/oauth/access_token
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture.type(large)
+            scope:
+              - email
+              - public_profile
 
 jwt:
   signerKey: XcZY99Tw3J9fiSQYbZEIAi2JTfifpUolb2+/3AvVPveVK0or6PJ418iY71DvyUa1
