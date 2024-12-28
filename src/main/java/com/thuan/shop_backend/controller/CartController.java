@@ -10,6 +10,7 @@ import com.thuan.shop_backend.service.cart.ICartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -53,6 +54,35 @@ public class CartController {
         List<CartResponse> cartResponses = cartService.getAllCartItems();
         return ApiResponse.<List<CartResponse>>builder()
                 .message("Get all cart items success")
+                .result(cartResponses)
+                .build();
+    }
+
+    @GetMapping("/items/{ids}")
+    public ApiResponse<List<CartResponse>> getCartByProductIds(
+            @PathVariable("ids") String ids) {
+
+        if (ids == null || ids.isBlank()) {
+            throw new AppException(ErrorCode.INVALID_KEY);
+        }
+
+        List<Long> numberProductIds;
+        try {
+            numberProductIds = Arrays.stream(ids.split(","))
+                    .map(String::trim)
+                    .map(Long::parseLong)
+                    .toList();
+        } catch (NumberFormatException ex) {
+            throw new AppException(ErrorCode.INVALID_KEY);
+        }
+
+        if (numberProductIds.isEmpty()) {
+            throw new AppException(ErrorCode.INVALID_KEY);
+        }
+
+        List<CartResponse> cartResponses = cartService.getCartItemsByIds(numberProductIds);
+        return ApiResponse.<List<CartResponse>>builder()
+                .message("Get cart items success")
                 .result(cartResponses)
                 .build();
     }

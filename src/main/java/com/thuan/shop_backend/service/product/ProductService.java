@@ -14,24 +14,19 @@ import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.file.IFileService;
-import com.thuan.shop_backend.service.product.recommend.FeatureService;
-import com.thuan.shop_backend.service.product.recommend.SimilarityService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import weka.core.Instances;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -45,8 +40,6 @@ public class ProductService implements IProductService{
     private final ProductPromotionRepository promotionCodeRepository;
 
     private final IFileService fileService;
-    private final FeatureService featureService;
-    private final SimilarityService similarityService;
     private final IProductRedisService productRedisService;
 
     @Override
@@ -149,71 +142,6 @@ public class ProductService implements IProductService{
     }
 
     @Override
-    public List<ProductResponse> recommendProducts(long productId, int topN) {
-
-        Product targetProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
-
-        List<Product> products = productRepository.findByCategoryId(targetProduct.getCategory().getId());
-        List<ProdRecommendRequest> recommendRequests = products.stream()
-                .map(product -> ProdRecommendRequest.builder()
-                        .name(product.getName())
-                        .description(product.getDescription())
-                        .categoryName(product.getCategory().getName())
-                        .price(product.getPrice())
-                        .quantity(product.getQuantity())
-                        .build())
-                .toList();
-
-        try {
-            Instances features = featureService.prepareTFIDFeatures(recommendRequests);
-
-            int targetIndex = findProductIndex(targetProduct);
-
-            double[] similarities = similarityService.calculateSimilarities(features, targetIndex);
-
-            return findTopNSimilarProducts(products, similarities, targetIndex, topN);
-        } catch (Exception e) {
-            throw new AppException(ErrorCode.FAILED_RECOMMEND);
-        }
-    }
-
-    private int findProductIndex(Product targetProduct) {
-        return featureService.getProductIndex(targetProduct.getName());
-    }
-
-    private List<ProductResponse> findTopNSimilarProducts(
-            List<Product> products, double[] similarities, int targetIndex, int topN) {
-
-        List<Integer> similarProductIndices = IntStream.range(0, similarities.length)
-                .boxed()
-                .filter(i -> i != targetIndex)
-                .sorted((i1, i2) -> Double.compare(similarities[i2], similarities[i1]))
-                .limit(topN)
-                .toList();
-
-        List<Product> similarProducts = similarProductIndices.stream()
-                .map(products::get)
-                .toList();
-
-        List<Long> productIds = similarProducts.stream()
-                .map(Product::getId)
-                .toList();
-
-        List<ProductImage> productImages = productImageRepository.findByProductIds(productIds);
-
-        Map<Long, List<ProductImage>> imagesGroupedByProduct = productImages.stream()
-                .collect(Collectors.groupingBy(image -> image.getProduct().getId()));
-
-        return similarProducts.stream()
-                .map(product -> {
-                    List<ProductImage> images = imagesGroupedByProduct.getOrDefault(product.getId(), Collections.emptyList());
-                    return ProductResponse.fromProduct(product, images);
-                })
-                .toList();
-    }
-
-    @Override
     public Page<ProductResponse> getFeatureProducts(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
@@ -238,10 +166,6 @@ public class ProductService implements IProductService{
             List<ProductImage> productImages = imagesGroupedByProduct.getOrDefault(product.getId(), Collections.emptyList());
             return ProductResponse.fromProduct(product, productImages);
         });
-    }
-
-    private List<ProductImage> getImagesForProduct(Long productId) {
-        return productImageRepository.findByProductIds(List.of(productId));
     }
 
     @Override

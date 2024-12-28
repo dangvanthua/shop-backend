@@ -25,8 +25,11 @@ public class Address {
     @Column(name = "city")
     private String city;
 
-    @Column(name = "state")
-    private String state;
+    @Column(name = "ward")
+    private String ward;
+
+    @Column(name = "district")
+    private String district;
 
     @Column(name = "postal_code")
     private String postalCode;

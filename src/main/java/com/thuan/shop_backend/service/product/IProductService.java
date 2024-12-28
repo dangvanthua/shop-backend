@@ -14,7 +14,6 @@ public interface IProductService {
     Product createProduct(ProductRequest productRequest);
     void uploadProductImages(long productId, Map<String, String> productImageUrl, boolean isThumbnail);
     Page<ProductResponse> getProductByCategory(long categoryId, Pageable pageable);
-    List<ProductResponse> recommendProducts(long productId, int topN);
     Page<ProductResponse> getFeatureProducts(int page, int size);
     ProductDetailResponse getProductDetail(long productId);
     Product updateProduct(long productId, ProductRequest productRequest);

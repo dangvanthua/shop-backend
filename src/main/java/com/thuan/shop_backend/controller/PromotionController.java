@@ -4,11 +4,15 @@ import com.thuan.shop_backend.dto.request.product.ProductPromotionRequest;
 import com.thuan.shop_backend.dto.request.promotion.PromotionCodeRequest;
 import com.thuan.shop_backend.dto.request.promotion.PromotionRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
+import com.thuan.shop_backend.dto.response.promotion.PromotionCodeResponse;
 import com.thuan.shop_backend.entity.Promotion;
 import com.thuan.shop_backend.entity.PromotionCode;
 import com.thuan.shop_backend.service.promotion.IPromotionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/promotions")
@@ -44,6 +48,20 @@ public class PromotionController {
         promotionService.addPromotionToProduct(productPromotionRequest);
         return ApiResponse.<Void>builder()
                 .message("Create product promotion code success")
+                .build();
+    }
+
+    @GetMapping("/{productIds}")
+    public ApiResponse<List<PromotionCodeResponse>> getAllPromotionCodes(
+            @PathVariable("productIds") String productIds) {
+        List<Long> productIdList = Arrays.stream(productIds.trim().split(","))
+                .map(String::trim)
+                .map(Long::parseLong)
+                .toList();
+        List<PromotionCodeResponse> promotionCodeResponses = promotionService.getAllPromotionCodes(productIdList);
+        return ApiResponse.<List<PromotionCodeResponse>>builder()
+                .message("Get all promotion code success")
+                .result(promotionCodeResponses)
                 .build();
     }
 }

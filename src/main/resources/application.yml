@@ -48,11 +48,22 @@ spring:
             client-secret: 49617d581207fdcb221a2f3fea439e67
             redirect-uri: http://localhost:4200/auth/facebook/callback
             auth-uri: https://www.facebook.com/v21.0/dialog/oauth
-            token-uri: https://graph.facebook.com/oauth/access_token
+            token-uri: https://graph.facebook.com/v21.0/oauth/access_token
             user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture.type(large)
             scope:
               - email
               - public_profile
+
+  ai:
+    openai:
+      api-key: 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
+      base-url: https://integrate.api.nvidia.com/v1
+      embedding:
+        enabled: false
+      chat:
+        options:
+          model: meta/llama-3.1-70b-instruct
+          max-tokens: 2048
 
 jwt:
   signerKey: XcZY99Tw3J9fiSQYbZEIAi2JTfifpUolb2+/3AvVPveVK0or6PJ418iY71DvyUa1

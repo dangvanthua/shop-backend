@@ -115,8 +115,7 @@ public class CartService implements ICartService{
 
         cartRepository.delete(cartItem);
     }
-
-
+    
     @Override
     public List<CartResponse> getAllCartItems() {
 
@@ -143,6 +142,37 @@ public class CartService implements ICartService{
                                  .build();
                      })
                      .toList();
+        }
+
+        return cartResponses;
+    }
+
+    @Override
+    public List<CartResponse> getCartItemsByIds(List<Long> productIds) {
+
+        String email = authComponent.getEmailFromAuthentication();
+        User user = userService.getUserByEmail(email);
+
+        List<CartItem> cartItems = cartRepository.findByUserIdAndProductIds(
+                user.getId(), productIds);
+
+        List<CartResponse> cartResponses = new ArrayList<>();
+        if(cartItems != null) {
+            cartResponses = cartItems.stream()
+                    .map(cartItem -> {
+
+                        List<ProductImage> productImages = productImageRepository
+                                .findByProductId(cartItem.getProduct().getId());
+
+                        return CartResponse.builder()
+                                .id(cartItem.getId())
+                                .quantity(cartItem.getQuantity())
+                                .addedAt(cartItem.getAddedAt())
+                                .productResponse(ProductResponse
+                                        .fromProduct(cartItem.getProduct(), productImages))
+                                .build();
+                    })
+                    .toList();
         }
 
         return cartResponses;

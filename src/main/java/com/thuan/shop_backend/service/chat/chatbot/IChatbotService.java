@@ -1,4 +1,5 @@
 package com.thuan.shop_backend.service.chat.chatbot;
 
-public class IChatbotService {
+public interface IChatbotService {
+    String generate(String userPrompt);
 }

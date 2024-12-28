@@ -85,18 +85,6 @@ public class ProductController {
                 .build();
     }
 
-    @GetMapping("/{id}/recommends")
-    public ApiResponse<List<ProductResponse>> recommendProducts(
-            @PathVariable("id") long productId,
-            @RequestParam(defaultValue = "8") int topN) {
-        List<ProductResponse> productResponses = productService.recommendProducts(productId, topN);
-        return ApiResponse.<List<ProductResponse>>builder()
-                .message("Get list product recommendations success")
-                .result(productResponses)
-                .build();
-    }
-
-
     @GetMapping("/{id}/category")
     public ApiResponse<ProductListResponse> getProductByCategory(
             @PathVariable("id") long categoryId,

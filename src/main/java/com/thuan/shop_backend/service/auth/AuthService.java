@@ -20,8 +20,6 @@ import com.thuan.shop_backend.dto.response.auth.IntrospectResponse;
 import com.thuan.shop_backend.entity.User;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
-import com.thuan.shop_backend.repository.PermissionRepository;
-import com.thuan.shop_backend.repository.RolePermissionRepository;
 import com.thuan.shop_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -223,7 +221,7 @@ public class AuthService implements IAuthService{
 
             case "facebook":
                 String urlGetAccessToken = UriComponentsBuilder
-                        .fromUriString(facebookAuthUri)
+                        .fromUriString(facebookTokenUri)
                         .queryParam("client_id", facebookClientId)
                         .queryParam("redirect_uri", facebookRedirectUri)
                         .queryParam("client_secret", facebookClientSecret)

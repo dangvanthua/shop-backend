@@ -4,6 +4,7 @@ import com.thuan.shop_backend.constant.DiscountType;
 import com.thuan.shop_backend.dto.request.product.ProductPromotionRequest;
 import com.thuan.shop_backend.dto.request.promotion.PromotionCodeRequest;
 import com.thuan.shop_backend.dto.request.promotion.PromotionRequest;
+import com.thuan.shop_backend.dto.response.promotion.PromotionCodeResponse;
 import com.thuan.shop_backend.entity.Product;
 import com.thuan.shop_backend.entity.ProductPromotionCode;
 import com.thuan.shop_backend.entity.Promotion;
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -119,5 +122,20 @@ public class PromotionService implements IPromotionService{
                 .build();
 
         productPromotionRepository.save(productPromotionCode);
+    }
+
+    @Override
+    public List<PromotionCodeResponse> getAllPromotionCodes(List<Long> productIds) {
+        List<ProductPromotionCode> allProductPromotionCode = new ArrayList<>();
+        for (long productId : productIds) {
+            List<ProductPromotionCode> productPromotionCodes = productPromotionRepository
+                    .findByProductId(productId);
+            if(productPromotionCodes != null) {
+                allProductPromotionCode.addAll(productPromotionCodes);
+            }
+        }
+        return allProductPromotionCode.stream()
+                .map(PromotionCodeResponse::fromProductPromotion)
+                .toList();
     }
 }

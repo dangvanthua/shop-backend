@@ -12,4 +12,5 @@ public interface ICartService {
     void removeCartItems(List<Long> productIds);
     void removeCartItem(long productId);
     List<CartResponse> getAllCartItems();
+    List<CartResponse> getCartItemsByIds(List<Long> productIds);
 }

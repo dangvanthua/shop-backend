@@ -85,10 +85,13 @@ public class UserService implements IUserService{
         User user = User.builder()
                 .fullName(userLoginRequest.getFullName())
                 .email(userLoginRequest.getEmail())
-                .avatar(userLoginRequest.getPicture())
                 .isActive(true)
                 .build();
 
+        if(userLoginRequest.getPicture() != null
+                && userLoginRequest.getPicture().length() <= 255) {
+            user.setAvatar(userLoginRequest.getPicture());
+        }
         user = userRepository.save(user);
 
         UserRoleId userRoleId = new UserRoleId(user.getId(), role.getId());
