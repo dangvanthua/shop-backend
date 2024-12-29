@@ -28,13 +28,15 @@ public class AddressService implements IAddressService{
     @Override
     @Transactional
     public void createAddress(AddressRequest addressRequest) {
-        List<Address> addressList = addressRepository.findAll();
         String email = authComponent.getEmailFromAuthentication();
         User user = userService.getUserByEmail(email);
 
         Address address = mapper.map(addressRequest, Address.class);
         address.setUser(user);
-        address.setIsDefault(addressList.isEmpty());
+
+        // check if user has other addresses then set it is false
+        List<Address> addresses = addressRepository.findByUserId(user.getId());
+        address.setIsDefault(addresses.isEmpty());
 
         addressRepository.save(address);
     }
