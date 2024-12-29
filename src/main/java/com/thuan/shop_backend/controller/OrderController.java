@@ -16,11 +16,11 @@ public class OrderController {
     private final IOrderService orderService;
 
     @PostMapping
-    public ApiResponse<Order> createOrder(@RequestBody OrderRequest orderRequest) {
-        Order order = orderService.createOrder(orderRequest);
-        return ApiResponse.<Order>builder()
+    public ApiResponse<String> createOrder(@RequestBody OrderRequest orderRequest) {
+        String urlOrder = orderService.createOrder(orderRequest);
+        return ApiResponse.<String>builder()
                 .message("Create order success")
-                .result(order)
+                .result(urlOrder)
                 .build();
     }
 

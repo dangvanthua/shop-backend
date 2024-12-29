@@ -1,11 +1,12 @@
 package com.thuan.shop_backend.service.payment;
 
 import com.thuan.shop_backend.dto.request.payment.BasePaymentRequest;
+import com.thuan.shop_backend.dto.request.payment.VerifyPaymentRequest;
 
 import java.util.Map;
 
 public interface IPaymentService {
     String getAccessToken();
     Map<String, Object> createPayment(BasePaymentRequest basePaymentRequest);
-    Map<String, Object> executePayment(String paymentId, String payerId);
+    Map<String, Object> executePayment(VerifyPaymentRequest verifyPaymentRequest);
 }

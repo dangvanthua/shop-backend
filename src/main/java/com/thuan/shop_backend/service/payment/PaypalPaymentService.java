@@ -2,12 +2,15 @@ package com.thuan.shop_backend.service.payment;
 
 import com.thuan.shop_backend.dto.request.payment.BasePaymentRequest;
 import com.thuan.shop_backend.dto.request.payment.PaypalPaymentRequest;
+import com.thuan.shop_backend.dto.request.payment.VerifyPaymentRequest;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
@@ -39,11 +42,12 @@ public class PaypalPaymentService implements IPaymentService {
         headers.set("Authorization", "Basic " + encodedAuth);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("grant_type", "client_credentials");
+        // Sử dụng MultiValueMap thay vì HashMap
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "client_credentials");
 
         RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(
                 url,
@@ -62,11 +66,10 @@ public class PaypalPaymentService implements IPaymentService {
 
     @Override
     public Map<String, Object> createPayment(BasePaymentRequest basePaymentRequest) {
-
         String url = baseUrl + "/v1/payments/payment";
         RestTemplate restTemplate = new RestTemplate();
 
-        if(basePaymentRequest instanceof PaypalPaymentRequest paypalRequest) {
+        if (basePaymentRequest instanceof PaypalPaymentRequest paypalRequest) {
 
             Map<String, Object> paymentBody = Map.of(
                     "intent", paypalRequest.getIntent(),
@@ -79,9 +82,8 @@ public class PaypalPaymentService implements IPaymentService {
                             "description", basePaymentRequest.getDescription()
                     )),
                     "redirect_urls", Map.of(
-                            "return_url", paypalRequest.getCancelUrl(),
-                            "cancel_url", basePaymentRequest.getCancelUrl(),
-                            "success_url", basePaymentRequest.getSuccessUrl()
+                            "return_url", paypalRequest.getSuccessUrl(),  // Địa chỉ trả về sau khi thanh toán thành công
+                            "cancel_url", paypalRequest.getCancelUrl()   // Địa chỉ trả về nếu thanh toán bị hủy
                     )
             );
 
@@ -99,18 +101,30 @@ public class PaypalPaymentService implements IPaymentService {
                     Map.class
             );
 
-            return response.getBody();
+            Map<String, Object> responseBody = response.getBody();
+
+            if (responseBody != null) {
+                // Trả về URL PayPal mà người dùng có thể truy cập để thanh toán
+                List<Map<String, String>> links = (List<Map<String, String>>) responseBody.get("links");
+                for (Map<String, String> link : links) {
+                    if ("approval_url".equals(link.get("rel"))) {
+                        return Map.of("approval_url", link.get("href"));
+                    }
+                }
+            }
+
+            throw new AppException(ErrorCode.PAYMENT_FAILED);
         }
 
         throw new AppException(ErrorCode.PAYMENT_FAILED);
     }
 
     @Override
-    public Map<String, Object> executePayment(String paymentId, String payerId) {
-        String url = baseUrl + "/v1/payments/payment/" + paymentId + "/execute";
+    public Map<String, Object> executePayment(VerifyPaymentRequest verifyPaymentRequest) {
+        String url = baseUrl + "/v1/payments/payment/" + verifyPaymentRequest.getPaymentId() + "/execute";
         RestTemplate restTemplate = new RestTemplate();
 
-        Map<String, String> body = Map.of("payer_id", payerId);
+        Map<String, String> body = Map.of("payer_id", verifyPaymentRequest.getPayerId());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + getAccessToken());

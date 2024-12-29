@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,5 +20,5 @@ public class CartItemRequest {
     private int quantity;
 
     @JsonProperty("promotion_code")
-    private String promotionCode;
+    private List<String> promotionCode;
 }

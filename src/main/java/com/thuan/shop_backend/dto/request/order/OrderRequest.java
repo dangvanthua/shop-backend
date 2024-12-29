@@ -1,8 +1,6 @@
 package com.thuan.shop_backend.dto.request.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thuan.shop_backend.constant.PaymentMethod;
-import com.thuan.shop_backend.constant.ShippingMethod;
 import com.thuan.shop_backend.dto.request.cart.CartItemRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,10 +21,10 @@ public class OrderRequest {
     private String shippingAddress;
 
     @JsonProperty("payment_method")
-    private PaymentMethod paymentMethod;
+    private String paymentMethod;
 
     @JsonProperty("shipping_method")
-    private ShippingMethod shippingMethod;
+    private String shippingMethod;
 
     @JsonProperty("cart_items")
     private List<CartItemRequest> cartItems;

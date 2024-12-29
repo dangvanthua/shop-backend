@@ -38,6 +38,9 @@ public class PromotionCodeResponse {
     @JsonProperty("is_active")
     private boolean isActive;
 
+    @JsonProperty("product_id")
+    private long productId;
+
     public static PromotionCodeResponse fromProductPromotion(ProductPromotionCode productPromotionCode) {
         return PromotionCodeResponse.builder()
                 .promotionCode(productPromotionCode.getPromotionCode().getCode())
@@ -48,6 +51,7 @@ public class PromotionCodeResponse {
                 .startDate(productPromotionCode.getPromotionCode().getStartDate())
                 .endDate(productPromotionCode.getPromotionCode().getEndDate())
                 .isActive(productPromotionCode.getPromotionCode().getIsActive())
+                .productId(productPromotionCode.getProduct().getId())
                 .build();
     }
 }

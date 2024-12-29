@@ -5,6 +5,6 @@ import com.thuan.shop_backend.dto.request.order.OrderStatusRequest;
 import com.thuan.shop_backend.entity.Order;
 
 public interface IOrderService {
-    Order createOrder(OrderRequest orderRequest);
+    String createOrder(OrderRequest orderRequest);
     Order updateOrderStatus(long orderId, OrderStatusRequest orderStatusRequest);
 }
