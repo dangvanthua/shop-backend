@@ -106,7 +106,7 @@ You may fork this project and use it for personal or commercial purposes. Howeve
 
 ## Contribution Guidelines
 
-We welcome contributions to improve this project! However, please follow these guidelines:
+I'm welcome contributions to improve this project! However, please follow these guidelines:
 1. Fork the repository.
 2. Make your changes on your own fork.
 3. Create a Pull Request to propose your changes to the main repository.
