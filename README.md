@@ -12,6 +12,7 @@ Smart Shop is an e-commerce platform built with Java Spring Boot for the backend
 - **Image Upload**: Cloudinary integration for product images
 - **Recommendation System**: Personalized product suggestions
 - **Database**: MySQL or PostgreSQL for product and user data
+- **Integration with Payment Gateway**: Add support for secure online payments (e.g., VNPay, PayPal).
 
 ## Tech Stack
 
