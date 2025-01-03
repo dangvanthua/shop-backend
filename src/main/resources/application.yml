@@ -65,6 +65,24 @@ spring:
           model: meta/llama-3.1-70b-instruct
           max-tokens: 2048
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: thuandang021102@gmail.com
+    password: 0123456789@T
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+
+cache:
+  product:
+    ttl: 300
+
 jwt:
   signerKey: XcZY99Tw3J9fiSQYbZEIAi2JTfifpUolb2+/3AvVPveVK0or6PJ418iY71DvyUa1
   valid-duration: 1800

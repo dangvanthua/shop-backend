@@ -9,6 +9,7 @@ import com.thuan.shop_backend.dto.request.cart.CartItemRequest;
 import com.thuan.shop_backend.dto.request.order.OrderRequest;
 import com.thuan.shop_backend.dto.request.order.OrderStatusRequest;
 import com.thuan.shop_backend.dto.request.payment.BasePaymentRequest;
+import com.thuan.shop_backend.dto.request.payment.PaymentRequest;
 import com.thuan.shop_backend.dto.request.payment.PaypalPaymentRequest;
 import com.thuan.shop_backend.dto.request.product.ProductRequest;
 import com.thuan.shop_backend.entity.*;
@@ -136,7 +137,7 @@ public class OrderService implements IOrderService{
         }
 
         if(orderRequest.getPaymentMethod().equalsIgnoreCase(PaymentMethod.E_WALLET.name())) {
-            PaypalPaymentRequest paymentRequest = PaypalPaymentRequest.builder()
+            PaypalPaymentRequest payPalPaymentRequest = PaypalPaymentRequest.builder()
                     .total(totalPrice / 23000)
                     .currency("USD")
                     .description(orderRequest.getNote())
@@ -146,7 +147,16 @@ public class OrderService implements IOrderService{
                     .intent("sale")
                     .build();
 
-            Map<String, Object> paymentResponse = paymentService.createPayment(paymentRequest);
+            Map<String, Object> paymentResponse = paymentService
+                    .createPayment(payPalPaymentRequest);
+
+            // implement save payment table when user pay success
+            PaymentRequest paymentRequest = PaymentRequest.builder()
+                    .orderId(order.getId())
+                    .paymentAmount(totalPrice)
+                    .build();
+
+            paymentService.savePayment(paymentRequest);
 
             return (String) paymentResponse.get("approval_url");
         }

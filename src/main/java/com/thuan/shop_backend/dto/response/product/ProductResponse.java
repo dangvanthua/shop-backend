@@ -50,4 +50,11 @@ public class ProductResponse {
                 .isActive(product.getIsActive())
                 .build();
     }
+
+    public static ProductResponse responseProductSearch(Product product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .build();
+    }
 }

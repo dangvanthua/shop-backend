@@ -1,10 +1,16 @@
 package com.thuan.shop_backend.service.payment;
 
+import com.thuan.shop_backend.constant.PaymentStatus;
 import com.thuan.shop_backend.dto.request.payment.BasePaymentRequest;
+import com.thuan.shop_backend.dto.request.payment.PaymentRequest;
 import com.thuan.shop_backend.dto.request.payment.PaypalPaymentRequest;
 import com.thuan.shop_backend.dto.request.payment.VerifyPaymentRequest;
+import com.thuan.shop_backend.entity.Order;
+import com.thuan.shop_backend.entity.Payment;
 import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
+import com.thuan.shop_backend.repository.OrderRepository;
+import com.thuan.shop_backend.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -14,13 +20,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class PaypalPaymentService implements IPaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository;
 
     @Value("${paypal.client-id}")
     private String clientId;
@@ -138,5 +146,17 @@ public class PaypalPaymentService implements IPaymentService {
                 Map.class);
 
         return response.getBody();
+    }
+
+    @Override
+    public void savePayment(PaymentRequest paymentRequest) {
+        Order order = orderRepository.findById(paymentRequest.getOrderId())
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
+        Payment payment = Payment.builder()
+                .order(order)
+                .paymentAmount(paymentRequest.getPaymentAmount())
+                .paymentStatus(PaymentStatus.PAID)
+                .build();
+        paymentRepository.save(payment);
     }
 }

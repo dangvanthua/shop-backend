@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IProductRedisService {
-    String getCacheKey(String keyword, int page, int size);
+    String getCacheKey(String keyword);
     Optional<String> getFromCache(String key);
-    List<ProductResponse> getProductFromCache(String cachedProducts);
-    void saveToCache(String key, Object value, Duration ttl);
+    void saveToCache(String key, String value);
     void deleteCache(String key);
+    boolean acquireLock(String lockKey, String lockValue, int expireTime);
+    void releaseLock(String lockKey, String lockValue);
 }

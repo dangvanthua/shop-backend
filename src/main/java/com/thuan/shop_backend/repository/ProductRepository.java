@@ -38,4 +38,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findProductsByTopSelling(
             @Param("status") OrderStatus status,
             Pageable pageable);
+
+    @Query("SELECT p FROM Product p " +
+            "WHERE p.name LIKE CONCAT('%', :keyword, '%') " +
+            "OR p.description LIKE CONCAT('%', :keyword, '%') " +
+            "OR p.category.name LIKE CONCAT('%', :keyword, '%')")
+    List<Product> findProductByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

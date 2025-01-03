@@ -36,12 +36,22 @@ public class CartService implements ICartService{
     @Override
     public CartItem createCartItem(CartRequest cartRequest) {
 
-        CartItem cartItem = mapper.map(cartRequest, CartItem.class);
-
         // get info email of user from security context
         String emailUser = authComponent.getEmailFromAuthentication();
 
         User user = userService.getUserByEmail(emailUser);
+
+        List<CartItem> cartItems = cartRepository.findByUserIdAndProductIds(
+                user.getId(),
+                List.of(cartRequest.getProductId()));
+
+        if(!cartItems.isEmpty()) {
+            CartItem existCartItem = cartItems.getFirst();
+            existCartItem.setQuantity(existCartItem.getQuantity() + 1);
+            return cartRepository.save(existCartItem);
+        }
+
+        CartItem cartItem = mapper.map(cartRequest, CartItem.class);
 
         Product product = productRepository.findById(cartRequest.getProductId())
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));

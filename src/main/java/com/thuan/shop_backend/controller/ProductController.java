@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,25 @@ public class ProductController {
         return ApiResponse.<ProductDetailResponse>builder()
                 .message("Get product detail success")
                 .result(productDetailResponse)
+                .build();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<List<ProductResponse>> searchProducts(
+            @RequestParam("q") String keyword) {
+
+        if(keyword == null || keyword.trim().isEmpty()) {
+            return ApiResponse.<List<ProductResponse>>builder()
+                    .message("Keyword is empty. No products found.")
+                    .result(Collections.emptyList())
+                    .build();
+        }
+
+        List<ProductResponse> productResponses = productService.getProductByKeyWord(keyword);
+
+        return ApiResponse.<List<ProductResponse>>builder()
+                .message("Get products with keyword '" + keyword + "' success")
+                .result(productResponses)
                 .build();
     }
 }

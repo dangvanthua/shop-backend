@@ -1,8 +1,10 @@
 package com.thuan.shop_backend.service.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thuan.shop_backend.constant.OrderStatus;
-import com.thuan.shop_backend.dto.request.product.ProdRecommendRequest;
 import com.thuan.shop_backend.dto.request.product.ProductRequest;
 import com.thuan.shop_backend.dto.response.product.ProductDetailResponse;
 import com.thuan.shop_backend.dto.response.product.ProductImageResponse;
@@ -14,14 +16,15 @@ import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.file.IFileService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,7 @@ public class ProductService implements IProductService{
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('SELLER') OR hasRole('ADMIN')")
     public Product createProduct(ProductRequest productRequest) {
 
         Seller seller = sellerRepository.findById(productRequest.getSellerId())
@@ -68,6 +72,7 @@ public class ProductService implements IProductService{
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('SELLER') OR hasRole('ADMIN')")
     public void uploadProductImages(
             long productId,
             Map<String, String> productImageUrl,
@@ -78,24 +83,54 @@ public class ProductService implements IProductService{
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
         // Kiểm tra số lượng ảnh chính (isThumbnail)
-        long existingThumbnailCount = productImageRepository.countByProductIdAndIsThumbnail(productId);
+        long existingThumbnailCount = productImageRepository
+                .countByProductIdAndImage(productId, true);
 
         // Nếu đang upload ảnh chính mới và đã có ảnh chính cũ, xóa ảnh chính cũ
         if (isThumbnail && existingThumbnailCount > 0) {
             // Tìm ảnh chính cũ và xóa nó
-            ProductImage existingThumbnail = productImageRepository.findByProductIdAndIsThumbnail(productId)
-                    .orElseThrow(() -> new AppException(ErrorCode.UPLOAD_FILE_FAILED));
+            List<ProductImage> existingThumbnails = productImageRepository
+                    .findByProductIdAndImage(productId, true);
 
-            // Xóa ảnh cũ trên Cloudinary nếu có
-            if (existingThumbnail.getCloudinaryPublicId() != null) {
-                fileService.deleteFile(existingThumbnail.getCloudinaryPublicId());
+            if(!existingThumbnails.isEmpty()) {
+                ProductImage existingThumbnail = existingThumbnails.getFirst();
+
+                // Xóa ảnh cũ trên Cloudinary nếu có
+                if (existingThumbnail.getCloudinaryPublicId() != null) {
+                    fileService.deleteFile(existingThumbnail.getCloudinaryPublicId());
+                }
+
+                // Xóa ảnh chính cũ trong cơ sở dữ liệu
+                productImageRepository.delete(existingThumbnail);
             }
+        }else {
+            // Kiểm tra số lượng hình ảnh gallery
+            long galleryCount = productImageRepository
+                    .countByProductIdAndImage(productId, false);
 
-            // Xóa ảnh chính cũ trong cơ sở dữ liệu
-            productImageRepository.delete(existingThumbnail);
+            int maxGalleries = 5;
+
+            // Vuot qua gioi han hinh cho phep xoa hinh anh cu
+            if(galleryCount + productImageUrl.size() > maxGalleries) {
+                List<ProductImage> galleryImages = productImageRepository
+                        .findByProductIdAndImage(productId, false);
+
+                int excessCount = (int) ((galleryCount + productImageUrl.size()) - maxGalleries);
+
+                for(int i = 0; i < excessCount; i++) {
+                    ProductImage oldProductImage = galleryImages.get(i);
+                    // xoa anh tren cloudinary
+                    if(oldProductImage.getCloudinaryPublicId() != null) {
+                        fileService.deleteFile(oldProductImage.getCloudinaryPublicId());
+                    }
+
+                    // xoa anh trong co so du lieu
+                    productImageRepository.delete(oldProductImage);
+                }
+            }
         }
 
-        // Upload và lưu các ảnh mới (không xóa ảnh gallery cũ)
+        // Upload và lưu các ảnh mới
         productImageUrl.forEach((cloudinaryPublicId, imageUrl) -> {
             ProductImage productImage = ProductImage.builder()
                     .product(product)
@@ -234,5 +269,66 @@ public class ProductService implements IProductService{
         }
 
         return productRepository.save(product);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ProductResponse> getProductByKeyWord(String keyword) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String redisKey = productRedisService.getCacheKey(keyword);
+        String lockKey = "lock:" + redisKey;
+        String lockValue = "locked";
+        int lockExpireTime = 10;
+
+        Optional<String> cachedResult = productRedisService.getFromCache(redisKey);
+
+        if (cachedResult.isPresent()) {
+            try {
+                return objectMapper.readValue(cachedResult.get(), new TypeReference<List<ProductResponse>>() {});
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to parse cached result", e);
+            }
+        }
+
+        if (productRedisService.acquireLock(lockKey, lockValue, lockExpireTime)) {
+            try {
+                Pageable pageable = PageRequest.of(0, 12);
+                List<Product> products = productRepository.findProductByKeyword(keyword, pageable);
+
+                // get images
+                List<Long> productIds = products.stream()
+                        .map(Product::getId)
+                        .toList();
+                List<ProductImage> images = productImageRepository.findByProductIds(productIds);
+
+                Map<Long, List<ProductImage>> imagesGroupedByProduct = images.stream()
+                        .collect(Collectors.groupingBy(image -> image.getProduct().getId()));
+
+                List<ProductResponse> productResponses = products.stream()
+                        .map((product) -> {
+                            List<ProductImage> productImages = imagesGroupedByProduct
+                                    .getOrDefault(product.getId(), Collections.emptyList());
+                            return ProductResponse.fromProduct(product, productImages);
+                        })
+                        .collect(Collectors.toList());
+
+                String jsonValue = objectMapper.writeValueAsString(productResponses);
+                productRedisService.saveToCache(redisKey, jsonValue);
+                return productResponses;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to populate cache", e);
+            } finally {
+                productRedisService.releaseLock(lockKey, lockValue);
+            }
+        } else {
+            try {
+                Thread.sleep(500);
+                return getProductByKeyWord(keyword);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Thread interrupted while waiting for lock", e);
+            }
+        }
     }
 }

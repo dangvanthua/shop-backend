@@ -3,6 +3,7 @@ package com.thuan.shop_backend.entity;
 import com.thuan.shop_backend.constant.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +24,7 @@ public class Payment {
     private Order order;
 
     @Column(name = "payment_date")
+    @CreationTimestamp
     private LocalDateTime paymentDate;
 
     @Column(name = "payment_amount")
