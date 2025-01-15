@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,6 +22,9 @@ public class OrderResponse {
 
     @JsonProperty("order_date")
     private LocalDate orderDate;
+
+    @JsonProperty("shipping_date")
+    private LocalDate shippingDate;
 
     @JsonProperty("shipping_address")
     private String shippingAddress;
@@ -39,23 +41,18 @@ public class OrderResponse {
     @JsonProperty("tracking_number")
     private String trackingNumber;
 
-    @JsonProperty("order_details")
-    private List<OrderDetailResponse> orderDetailResponses;
-
-    public static OrderResponse fromOrder(
-            Order order,
-            List<OrderDetailResponse> orderDetailResponses) {
-
+    public static OrderResponse fromOrder(Order order) {
         return OrderResponse.builder()
                 .id(order.getId())
                 .note(order.getNote())
                 .orderDate(order.getOrderDate())
+                .shippingDate(order.getShippingDate() != null
+                        ? order.getShippingDate() : null)
                 .shippingAddress(order.getShippingAddress())
                 .shippingMethod(order.getShippingMethod())
                 .paymentMethod(order.getPaymentMethod())
                 .status(order.getStatus().name())
                 .trackingNumber(order.getTrackingNumber())
-                .orderDetailResponses(orderDetailResponses)
                 .build();
     }
 }

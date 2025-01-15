@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT COUNT(p) > 0 FROM Product p WHERE p.category.id = :categoryId")
@@ -44,4 +45,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "OR p.description LIKE CONCAT('%', :keyword, '%') " +
             "OR p.category.name LIKE CONCAT('%', :keyword, '%')")
     List<Product> findProductByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT p FROM Product p " +
+            "JOIN FETCH p.seller s " +
+            "WHERE p.id = :productId")
+    Optional<Product> findByProductIdWithSeller(@Param("productId") long productId);
 }

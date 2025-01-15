@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thuan.shop_backend.dto.response.category.CategoryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class CategoryRedisService implements ICategoryRedisService{
     @Autowired
     private ObjectMapper redisObjectMapper;
 
+    @Value("${cache.product.ttl}")
+    private int cacheTtl;
+
     private final String CATEGORY_CACHE_KEY = "categories";
 
     @Override
@@ -33,7 +37,7 @@ public class CategoryRedisService implements ICategoryRedisService{
     @Override
     public void saveCategoriesToCache(List<CategoryResponse> categories) throws JsonProcessingException {
         String json = redisObjectMapper.writeValueAsString(categories);
-        redisTemplate.opsForValue().set(CATEGORY_CACHE_KEY, json, Duration.ofMinutes(30));
+        redisTemplate.opsForValue().set(CATEGORY_CACHE_KEY, json, Duration.ofSeconds(cacheTtl));
     }
 
     @Override

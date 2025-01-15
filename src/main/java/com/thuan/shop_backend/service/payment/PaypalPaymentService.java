@@ -41,7 +41,6 @@ public class PaypalPaymentService implements IPaymentService {
 
     @Override
     public String getAccessToken() {
-
         String url = baseUrl + "/v1/oauth2/token";
         String auth = clientId + ":" + clientSecret;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());

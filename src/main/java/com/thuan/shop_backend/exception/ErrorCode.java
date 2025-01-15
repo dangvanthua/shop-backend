@@ -56,7 +56,8 @@ public enum ErrorCode {
     INVALID_QUANTITY(1046, "Quantity must be greater than 0 and less than quantity product", HttpStatus.BAD_REQUEST),
     CART_NOT_EXISTED(1047, "Cart not existed", HttpStatus.NOT_FOUND),
     PAYMENT_FAILED(1048, "Payment is failed", HttpStatus.BAD_REQUEST),
-    ADDRESS_NOT_EXISTED(1049, "Address not existed", HttpStatus.NOT_FOUND);
+    ADDRESS_NOT_EXISTED(1049, "Address not existed", HttpStatus.NOT_FOUND),
+    SEND_MAIL_FAILED(1050, "Sent email failed", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
