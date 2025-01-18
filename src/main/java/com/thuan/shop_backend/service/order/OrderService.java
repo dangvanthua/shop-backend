@@ -170,7 +170,8 @@ public class OrderService implements IOrderService{
         if(orderRequest.getPaymentMethod() != null &&
                 !orderRequest.getPaymentMethod().equalsIgnoreCase(PaymentMethod.COD.name())) {
             // execute create payment and return payment response
-            Map<String, Object> paymentResponse = executeCreatePayment(orderRequest, totalPrice);
+            Map<String, Object> paymentResponse = executeCreatePayment(
+                    orderRequest, totalPrice, order.getId());
 
             // implement save payment table when user pay success
             PaymentRequest paymentRequest = PaymentRequest.builder()
@@ -215,7 +216,10 @@ public class OrderService implements IOrderService{
         return sb.toString();
     }
 
-    private Map<String, Object> executeCreatePayment(OrderRequest orderRequest, BigDecimal totalPrice) {
+    private Map<String, Object> executeCreatePayment(
+            OrderRequest orderRequest,
+            BigDecimal totalPrice,
+            long orderId) {
         if(orderRequest.getPaymentMethod().equalsIgnoreCase(PaymentMethod.E_WALLET.name())) {
 
             BigDecimal exchangeRate = BigDecimal.valueOf(25000);
@@ -226,7 +230,7 @@ public class OrderService implements IOrderService{
                     .currency("USD")
                     .description(orderRequest.getNote())
                     .cancelUrl("http://localhost:4200/payment/cancel")
-                    .successUrl("http://localhost:4200/payment/success")
+                    .successUrl("http://localhost:4200/payment/success/" + orderId)
                     .method("paypal")
                     .intent("sale")
                     .build();

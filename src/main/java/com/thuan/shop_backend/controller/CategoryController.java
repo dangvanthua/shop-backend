@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,7 +35,7 @@ public class CategoryController {
     @GetMapping
     public ApiResponse<List<CategoryResponse>> getAllCategories() throws JsonProcessingException {
         // Lay danh sach danh muc tu redis
-        List<CategoryResponse> categoryResponses = null;
+        List<CategoryResponse> categoryResponses;
 
         categoryResponses = categoryRedisService.getCategoriesFromCache();
 

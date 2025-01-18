@@ -1,5 +1,6 @@
 package com.thuan.shop_backend.service.payment;
 
+import com.thuan.shop_backend.constant.OrderStatus;
 import com.thuan.shop_backend.constant.PaymentStatus;
 import com.thuan.shop_backend.dto.request.payment.BasePaymentRequest;
 import com.thuan.shop_backend.dto.request.payment.PaymentRequest;
@@ -11,6 +12,7 @@ import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.OrderRepository;
 import com.thuan.shop_backend.repository.PaymentRepository;
+import com.thuan.shop_backend.service.order.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -143,6 +145,14 @@ public class PaypalPaymentService implements IPaymentService {
                 HttpMethod.POST,
                 request,
                 Map.class);
+
+        // if it is not approved then cancel order
+        if(!response.getBody().get("state").equals("approved")) {
+            Order order = orderRepository.findById(verifyPaymentRequest.getOrderId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
+            order.setStatus(OrderStatus.CANCELLED);
+            orderRepository.save(order);
+        }
 
         return response.getBody();
     }

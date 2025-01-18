@@ -17,4 +17,7 @@ public class VerifyPaymentRequest {
 
     @JsonProperty("payer_id")
     private String payerId;
+
+    @JsonProperty("order_id")
+    private long orderId;
 }

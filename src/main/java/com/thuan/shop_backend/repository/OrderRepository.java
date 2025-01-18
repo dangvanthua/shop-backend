@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -24,4 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("reference") String reference,
             @Param("userId") Long userId,
             Pageable pageable);
+
+    @Query("SELECT DISTINCT o.product.seller.id FROM OrderDetail o WHERE o.order.user.id = :userId")
+    List<Long> findSellerIdsByUserId(@Param("userId") Long userId);
 }
