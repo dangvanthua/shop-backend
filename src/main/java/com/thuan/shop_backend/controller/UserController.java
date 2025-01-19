@@ -104,4 +104,14 @@ public class UserController {
                 .message("Upload avatar image success")
                 .build();
     }
+
+    @GetMapping("/by-user-id")
+    public ApiResponse<List<UserResponse>> getSellersByUserId() {
+
+        List<UserResponse> userResponses = userService.getSellerByUserId();
+        return ApiResponse.<List<UserResponse>>builder()
+                .message("Get user from seller success")
+                .result(userResponses)
+                .build();
+    }
 }

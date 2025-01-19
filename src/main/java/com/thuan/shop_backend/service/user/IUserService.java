@@ -18,4 +18,5 @@ public interface IUserService {
     void uploadAvatarUser(long userId, String publicId, String avatarUrl);
     User getUserByEmail(String email);
     UserResponse getUserDetail();
+    List<UserResponse> getSellerByUserId();
 }

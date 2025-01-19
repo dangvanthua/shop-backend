@@ -1,10 +1,14 @@
 package com.thuan.shop_backend.service.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thuan.shop_backend.component.AuthComponent;
 import com.thuan.shop_backend.constant.PredefinedRole;
 import com.thuan.shop_backend.constant.ProviderType;
 import com.thuan.shop_backend.dto.request.user.UserCreateRequest;
 import com.thuan.shop_backend.dto.request.user.UserLoginRequest;
+import com.thuan.shop_backend.dto.response.role.RoleResponse;
 import com.thuan.shop_backend.dto.response.user.UserResponse;
 import com.thuan.shop_backend.entity.*;
 import com.thuan.shop_backend.exception.AppException;
@@ -19,6 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -233,6 +241,46 @@ public class UserService implements IUserService{
         String email = authComponent.getEmailFromAuthentication();
         User user = getUserByEmail(email);
         return UserResponse.fromUser(user);
+    }
+
+    @Override
+    public List<UserResponse> getSellerByUserId() {
+        String email = authComponent.getEmailFromAuthentication();
+        User user = getUserByEmail(email);
+
+        // get info seller that current user bought
+        List<Object[]> results = userRepository.getSellerUsersForBuyer(user.getId());
+
+        List<UserResponse> userResponses = new ArrayList<>();
+        for (Object[] result : results) {
+
+            RoleResponse roleResponse = RoleResponse.builder()
+                    .id((Long) result[9])
+                    .name((String) result[10])
+                    .description((String) result[11])
+                    .build();
+
+            LocalDate dateOfBirth = ((java.sql.Date) result[5]).toLocalDate();
+            LocalDateTime createdAt = ((java.sql.Timestamp) result[7]).toLocalDateTime();
+            LocalDateTime updatedAt = ((java.sql.Timestamp) result[8]).toLocalDateTime();
+
+            UserResponse userResponse = UserResponse.builder()
+                    .id(((Integer) result[0]).longValue())
+                    .fullName((String) result[1])
+                    .phoneNumber((String) result[2])
+                    .email((String) result[3])
+                    .isActive((Boolean) result[4])
+                    .dateOfBirth(dateOfBirth)
+                    .avatar((String) result[6])
+                    .createdAt(createdAt)
+                    .updatedAt(updatedAt)
+                    .roleResponses(List.of(roleResponse))
+                    .build();
+
+            userResponses.add(userResponse);
+        }
+
+        return userResponses;
     }
 
     private void validateUserUniqueness(String email, String phoneNumber) {
