@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -230,8 +231,9 @@ public class ProductService implements IProductService{
         SellerInfoResponse sellerInfo = SellerInfoResponse.fromSeller(
                 seller, totalProductsSold, totalReviews);
 
+        // Lay thoi gian hien tai
         List<ProductPromotionCode> productPromotionCode = promotionCodeRepository
-                .findByProductId(product.getId());
+                .findByProductId(product.getId(), LocalDate.now());
 
         List<PromotionCodeResponse> promotionCodeResponses = productPromotionCode.stream()
                 .map(PromotionCodeResponse::fromProductPromotion)

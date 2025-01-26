@@ -4,7 +4,9 @@ import com.thuan.shop_backend.component.CustomJwtDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,6 +20,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -44,15 +49,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http.cors(corsCustomize ->
-                corsCustomize.configurationSource(corsConfigurationSource()));
-
+        http.cors(Customizer.withDefaults());
         http.authorizeHttpRequests(request -> { request
                     .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS_POST).permitAll()
                     .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT_GET).permitAll()
-                    .anyRequest()
-                    .authenticated();
+                    .requestMatchers("/ws/**").permitAll()
+                    .anyRequest().authenticated();
         });
 
         http.oauth2ResourceServer(oauth2 ->
@@ -77,16 +79,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+    public CorsFilter corsFilter() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:4200");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+        config.setAllowedHeaders(Arrays.asList(
+                HttpHeaders.ORIGIN,
+                HttpHeaders.CONTENT_TYPE,
+                HttpHeaders.ACCEPT,
+                HttpHeaders.AUTHORIZATION
+        ));
+        config.setAllowedMethods(Arrays.asList(
+                "GET",
+                "POST",
+                "DELETE",
+                "PUT",
+                "PATCH"
+        ));
         source.registerCorsConfiguration("/**", config);
-        return source;
+        return new CorsFilter(source);
     }
 
     @Bean

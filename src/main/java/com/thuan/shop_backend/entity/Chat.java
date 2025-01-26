@@ -48,12 +48,12 @@ public class Chat {
     private User recipient;
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.EAGER)
-    @OrderBy("createdDate DESC")
+    @OrderBy("sentAt DESC")
     private List<Message> messages;
 
     @Transient
-    public String getChatAvatar(long recipientId) {
-        return recipient.getId() == recipientId ? recipient.getAvatar() : sender.getAvatar();
+    public String getChatAvatar(long senderId) {
+        return sender.getId() == senderId ? recipient.getAvatar() : sender.getAvatar();
     }
 
     @Transient

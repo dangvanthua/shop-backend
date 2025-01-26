@@ -39,7 +39,7 @@ public class ChatController {
 
     @PostMapping
     public ApiResponse<Long> createChat(@RequestBody ChatRequest chatRequest) {
-        long chatId = chatService.createChat(chatRequest.getSenderId(), chatRequest.getReceiverId());
+        long chatId = chatService.createChat(chatRequest.getReceiverId());
         return ApiResponse.<Long>builder()
                 .message("Create chat success")
                 .result(chatId)

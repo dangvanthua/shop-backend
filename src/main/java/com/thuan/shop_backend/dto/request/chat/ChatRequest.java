@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ChatRequest {
-    @JsonProperty("sender_id")
-    private long senderId;
-
     @JsonProperty("receiver_id")
     private long receiverId;
 }

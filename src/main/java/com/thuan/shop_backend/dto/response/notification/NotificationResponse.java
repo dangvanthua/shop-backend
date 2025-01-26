@@ -33,5 +33,7 @@ public class NotificationResponse {
     private MessageType messageType;
 
     private NotificationType type;
-    private byte[] media;
+
+    @JsonProperty("media_url")
+    private String mediaUrl;
 }

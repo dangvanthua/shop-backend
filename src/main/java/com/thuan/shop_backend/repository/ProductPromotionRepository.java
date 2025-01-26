@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +14,12 @@ public interface ProductPromotionRepository extends JpaRepository<ProductPromoti
             "JOIN FETCH ppc.promotionCode pc " +
             "JOIN pc.promotion pr " +
             "WHERE ppc.product.id = :productId " +
+            "AND :dateNow BETWEEN pc.startDate AND pc.endDate " +
             "AND pr.isActive = true " +
             "AND pc.isActive = true")
-    List<ProductPromotionCode> findByProductId(@Param("productId") long productId);
+    List<ProductPromotionCode> findByProductId(
+            @Param("productId") long productId,
+            @Param("dateNow")LocalDate dateNow);
 
     @Query("SELECT ppc FROM ProductPromotionCode ppc " +
             "WHERE ppc.product.id = :productId " +

@@ -1,8 +1,5 @@
 package com.thuan.shop_backend.service.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thuan.shop_backend.component.AuthComponent;
 import com.thuan.shop_backend.constant.PredefinedRole;
 import com.thuan.shop_backend.constant.ProviderType;
@@ -245,17 +242,22 @@ public class UserService implements IUserService{
 
     @Override
     public List<UserResponse> getSellerByUserId() {
+
         String email = authComponent.getEmailFromAuthentication();
         User user = getUserByEmail(email);
 
-        // get info seller that current user bought
-        List<Object[]> results = userRepository.getSellerUsersForBuyer(user.getId());
+        Role role = roleRepository.findByName(PredefinedRole.SELLER.name())
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+
+        List<Object[]> results = userRepository.findSellersForBuyer(
+                user.getId(), role.getId());
 
         List<UserResponse> userResponses = new ArrayList<>();
+
         for (Object[] result : results) {
 
             RoleResponse roleResponse = RoleResponse.builder()
-                    .id((Long) result[9])
+                    .id((Integer) result[9])
                     .name((String) result[10])
                     .description((String) result[11])
                     .build();

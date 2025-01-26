@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -128,8 +129,9 @@ public class PromotionService implements IPromotionService{
     public List<PromotionCodeResponse> getAllPromotionCodes(List<Long> productIds) {
         List<ProductPromotionCode> allProductPromotionCode = new ArrayList<>();
         for (long productId : productIds) {
+            LocalDate dateNow = LocalDate.now();
             List<ProductPromotionCode> productPromotionCodes = productPromotionRepository
-                    .findByProductId(productId);
+                    .findByProductId(productId, dateNow);
             if(productPromotionCodes != null) {
                 allProductPromotionCode.addAll(productPromotionCodes);
             }

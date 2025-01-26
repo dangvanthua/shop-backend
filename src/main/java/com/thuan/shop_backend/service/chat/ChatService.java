@@ -54,15 +54,17 @@ public class ChatService implements IChatService{
 
     @Override
     @Transactional
-    public long createChat(long senderId, long receiverId) {
+    public long createChat(long receiverId) {
 
-        Optional<Chat> existingChat = chatRepository.findChatByReceiverAndSender(senderId, receiverId);
+        String emailUser = authComponent.getEmailFromAuthentication();
+        User sender = userRepository.findByEmail(emailUser)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Optional<Chat> existingChat = chatRepository.findChatByReceiverAndSender(
+                sender.getId(), receiverId);
         if(existingChat.isPresent()) {
             return existingChat.get().getId();
         }
-
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));

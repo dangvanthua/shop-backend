@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IChatService {
     List<ChatResponse> getChatsByReceiverId(int page, int size);
-    long createChat(long senderId, long receiverId);
+    long createChat(long receiverId);
 }
