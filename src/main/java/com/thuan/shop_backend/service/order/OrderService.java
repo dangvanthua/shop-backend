@@ -71,17 +71,14 @@ public class OrderService implements IOrderService{
         order.setStatus(OrderStatus.PENDING);
         order.setActive(true);
 
-        // implement generate tracking number by algorithm
         String trackingNumber = generateTrackingNumber(user.getId());
         order.setTrackingNumber(trackingNumber);
 
-        // Lưu đơn hàng
         order = orderRepository.save(order);
 
         BigDecimal shippingFee = calculateFeeShip(orderRequest);
         BigDecimal totalPrice = BigDecimal.ZERO;
 
-        // create variable type OrderDetail to save data
         List<OrderDetail> tmpOrderDetails = new ArrayList<>();
 
         for (CartItemRequest cartItem : orderRequest.getCartItems()) {
@@ -90,7 +87,6 @@ public class OrderService implements IOrderService{
                     .findByProductIdWithSeller(cartItem.getProductId())
                     .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
-            // check if user is seller then don't create order
             if(Objects.equals(product.getSeller().getUser().getId(), user.getId())) {
                 throw new AppException(ErrorCode.UNAUTHORIZED);
             }
@@ -102,7 +98,6 @@ public class OrderService implements IOrderService{
             BigDecimal itemTotalMoney = BigDecimal.valueOf(product.getPrice())
                     .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
-            // Áp dụng từng mã giảm giá
             if (cartItem.getPromotionCode() != null && !cartItem.getPromotionCode().isEmpty()) {
                 for (String promoCode : cartItem.getPromotionCode()) {
                     PromotionCode promotionCode = promotionCodeRepository.findByCode(promoCode)
@@ -120,14 +115,12 @@ public class OrderService implements IOrderService{
                             .findByProductIdAndPromotionId(product.getId(), promotionCode.getId())
                             .orElseThrow(() -> new AppException(ErrorCode.PROMOTION_CODE_EXPIRED));
 
-                    // Tính giảm giá
                     BigDecimal discount = BigDecimal.valueOf(promotionCode.getDiscountValue());
                     if (promotionCode.getPromotion().getDiscountType()
                             .equalsIgnoreCase(DiscountType.PERCENTAGE.name())) {
                         discount = itemTotalMoney.multiply(discount.divide(BigDecimal.valueOf(100)));
                     }
 
-                    // Ensure discount does not exceed item price
                     itemTotalMoney = itemTotalMoney.subtract(discount).max(BigDecimal.ZERO);
                 }
             }
@@ -135,7 +128,6 @@ public class OrderService implements IOrderService{
             itemTotalMoney = itemTotalMoney.add(shippingFee);
             totalPrice = totalPrice.add(itemTotalMoney);
 
-            // Tạo chi tiết đơn hàng
             OrderDetail orderDetail = OrderDetail.builder()
                     .order(order)
                     .product(product)
@@ -144,14 +136,11 @@ public class OrderService implements IOrderService{
                     .totalMoney(itemTotalMoney.doubleValue())
                     .build();
 
-            // Lưu chi tiết đơn hàng
             orderDetail = orderDetailRepository.save(orderDetail);
             tmpOrderDetails.add(orderDetail);
 
-            // Xóa sản phẩm trong giỏ hàng
             cartService.removeCartItem(product.getId());
 
-            // Cập nhật lại số lượng sản phẩm
             ProductRequest productRequest = ProductRequest.builder()
                     .quantity(product.getQuantity() - cartItem.getQuantity())
                     .build();
@@ -159,7 +148,6 @@ public class OrderService implements IOrderService{
             productService.updateProduct(product.getId(), productRequest);
         }
 
-        // implement builder email request to send email to user
         MailRequest mailRequest = MailRequest.builder()
                 .mailFrom("smart-shop@gmail.com")
                 .mailTo(user.getEmail())
@@ -169,11 +157,10 @@ public class OrderService implements IOrderService{
 
         if(orderRequest.getPaymentMethod() != null &&
                 !orderRequest.getPaymentMethod().equalsIgnoreCase(PaymentMethod.COD.name())) {
-            // execute create payment and return payment response
+            
             Map<String, Object> paymentResponse = executeCreatePayment(
                     orderRequest, totalPrice, order.getId());
 
-            // implement save payment table when user pay success
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .orderId(order.getId())
                     .paymentAmount(totalPrice.doubleValue())
@@ -181,13 +168,11 @@ public class OrderService implements IOrderService{
 
             paymentService.savePayment(paymentRequest);
 
-            // implement call to email service when pay type e_wallet
             emailService.sendMailConfirmationOrder(mailRequest);
 
             return (String) paymentResponse.get("approval_url");
         }
 
-        // implement call to email service when pay type cod
         emailService.sendMailConfirmationOrder(mailRequest);
 
         return null;
