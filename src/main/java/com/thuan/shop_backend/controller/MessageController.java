@@ -25,8 +25,10 @@ public class MessageController {
     }
 
     @PatchMapping
-    public ApiResponse<Void> setMessageToSeen(@RequestParam("chat-id") long chatId) {
-        messageService.setMessagesToSeen(chatId);
+    public ApiResponse<Void> setMessageToSeen(
+            @RequestParam("chat-id") String chatId) {
+        long chatIdParsed = Long.parseLong(chatId);
+        messageService.setMessagesToSeen(chatIdParsed);
         return ApiResponse.<Void>builder()
                 .message("Update message seen success")
                 .build();

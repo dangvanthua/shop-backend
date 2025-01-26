@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -73,6 +74,15 @@ public class GlobalExceptionHandler {
         errorResponse.setCode(errorCode.getCode());
         errorResponse.setMessage(errorCode.getMessage());
 
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParams(MissingServletRequestParameterException ex) {
+        String message = "Required parameter '" + ex.getParameterName() + "' is missing";
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
+        errorResponse.setMessage(message);
         return ResponseEntity.badRequest().body(errorResponse);
     }
 }
