@@ -13,6 +13,9 @@ import com.thuan.shop_backend.service.order.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -66,5 +69,18 @@ public class OrderController {
                 .message("Get order success")
                 .result(orderHistoryResponse)
                 .build();
+    }
+
+    @GetMapping("/{id}/export-pdf")
+    public ResponseEntity<byte[]> exportOrderPdf(@PathVariable("id") long orderId) {
+        byte[] pdfBytes = orderService.exportOrderPdf(orderId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "order_" + orderId + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }

@@ -18,16 +18,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     @Query(value = """
-        SELECT DISTINCT u.id,  
+        SELECT DISTINCT u.id,
                         u.fullname,
                         u.phone_number,
                         u.email,
                         u.is_active,
                         u.date_of_birth,
-                        u.avatar, 
+                        u.avatar,
                         u.created_at,
                         u.updated_at,
-                        r.id AS role_id, 
+                        r.id AS role_id,
                         r.name AS role_name,
                         r.description AS role_description
         FROM orders o

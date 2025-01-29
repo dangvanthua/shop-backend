@@ -2,11 +2,12 @@ package com.thuan.shop_backend.service.message;
 
 import com.thuan.shop_backend.dto.request.message.MessageRequest;
 import com.thuan.shop_backend.dto.response.message.MessageResponse;
+import com.thuan.shop_backend.dto.response.message.MessageResponses;
 
 import java.util.List;
 
 public interface IMessageService {
     void saveMessage(MessageRequest messageRequest);
-    List<MessageResponse> findChatMessages(long chatId, int page, int size);
+    MessageResponses findChatMessages(long chatId, int page, int size);
     void setMessagesToSeen(long chatId);
 }

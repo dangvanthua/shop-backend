@@ -12,4 +12,5 @@ public interface IOrderService {
     String createOrder(OrderRequest orderRequest);
     Order updateOrderStatus(long orderId, OrderStatusRequest orderStatusRequest);
     OrderHistoryResponse getOrderByFilterAndPaginate(OrderFilterRequest orderFilterRequest, Pageable pageable);
+    byte[] exportOrderPdf(long orderId);
 }

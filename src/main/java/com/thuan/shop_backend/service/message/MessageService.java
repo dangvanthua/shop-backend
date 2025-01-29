@@ -5,6 +5,7 @@ import com.thuan.shop_backend.constant.MessageState;
 import com.thuan.shop_backend.constant.NotificationType;
 import com.thuan.shop_backend.dto.request.message.MessageRequest;
 import com.thuan.shop_backend.dto.response.message.MessageResponse;
+import com.thuan.shop_backend.dto.response.message.MessageResponses;
 import com.thuan.shop_backend.dto.response.notification.NotificationResponse;
 import com.thuan.shop_backend.entity.Chat;
 import com.thuan.shop_backend.entity.Message;
@@ -16,6 +17,7 @@ import com.thuan.shop_backend.repository.MessageRepository;
 import com.thuan.shop_backend.service.notification.INotificationService;
 import com.thuan.shop_backend.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -67,11 +69,22 @@ public class MessageService implements IMessageService{
     }
 
     @Override
-    public List<MessageResponse> findChatMessages(long chatId, int page, int size) {
+    public MessageResponses findChatMessages(long chatId, int page, int size) {
+
         Pageable pageable = PageRequest.of(page, size);
-        return messageRepository.findMessagesByChatId(chatId, pageable).stream()
+
+        Page<Message> messagePage = messageRepository.findMessagesByChatId(chatId, pageable);
+
+        List<MessageResponse> messageResponses = messagePage.getContent()
+                .stream()
                 .map(MessageResponse::fromMessage)
                 .toList();
+
+        return MessageResponses.builder()
+                .messageResponses(messageResponses)
+                .totalElements(messagePage.getTotalElements())
+                .totalPages(messagePage.getTotalPages())
+                .build();
     }
 
     @Override

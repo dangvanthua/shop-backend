@@ -8,6 +8,7 @@ import com.thuan.shop_backend.constant.ShippingMethod;
 import com.thuan.shop_backend.dto.request.cart.CartItemRequest;
 import com.thuan.shop_backend.dto.request.email.MailRequest;
 import com.thuan.shop_backend.dto.request.order.OrderFilterRequest;
+import com.thuan.shop_backend.dto.request.order.OrderPdfRequest;
 import com.thuan.shop_backend.dto.request.order.OrderRequest;
 import com.thuan.shop_backend.dto.request.order.OrderStatusRequest;
 import com.thuan.shop_backend.dto.request.payment.PaymentRequest;
@@ -21,6 +22,7 @@ import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.cart.ICartService;
 import com.thuan.shop_backend.service.email.IEmailService;
+import com.thuan.shop_backend.service.file.IFileService;
 import com.thuan.shop_backend.service.payment.IPaymentService;
 import com.thuan.shop_backend.service.product.IProductService;
 import com.thuan.shop_backend.service.user.IUserService;
@@ -33,6 +35,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
@@ -55,6 +58,7 @@ public class OrderService implements IOrderService{
     private final IUserService userService;
     private final ICartService cartService;
     private final IPaymentService paymentService;
+    private final IFileService fileService;
 
     @Override
     @Transactional
@@ -315,5 +319,22 @@ public class OrderService implements IOrderService{
                 .totalElements(orderPage.getTotalElements())
                 .totalPages(orderPage.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public byte[] exportOrderPdf(long orderId) {
+        try {
+            Order order = orderRepository.findByIdWithUser(orderId)
+                    .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXISTED));
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+            OrderPdfRequest orderPdfRequest = OrderPdfRequest.builder()
+                    .order(order)
+                    .orderDetail(orderDetails)
+                    .build();
+            return fileService.exportOrderPdf(orderPdfRequest);
+        }catch (IOException e) {
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+
     }
 }

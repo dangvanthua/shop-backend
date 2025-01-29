@@ -3,6 +3,7 @@ package com.thuan.shop_backend.controller;
 import com.thuan.shop_backend.dto.request.message.MessageRequest;
 import com.thuan.shop_backend.dto.response.ApiResponse;
 import com.thuan.shop_backend.dto.response.message.MessageResponse;
+import com.thuan.shop_backend.dto.response.message.MessageResponses;
 import com.thuan.shop_backend.service.message.IMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -35,12 +36,12 @@ public class MessageController {
     }
 
     @GetMapping("/chat/{chat-id}")
-    public ApiResponse<List<MessageResponse>> getAllMessages(
+    public ApiResponse<MessageResponses> getAllMessages(
             @PathVariable("chat-id") long chatId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        List<MessageResponse> messageResponses = messageService.findChatMessages(chatId, page, size);
-        return ApiResponse.<List<MessageResponse>>builder()
+        MessageResponses messageResponses = messageService.findChatMessages(chatId, page, size);
+        return ApiResponse.<MessageResponses>builder()
                 .message("Get all message of " + chatId + " success")
                 .result(messageResponses)
                 .build();
