@@ -107,7 +107,6 @@ public class UserController {
 
     @GetMapping("/by-user-id")
     public ApiResponse<List<UserResponse>> getSellersByUserId() {
-
         List<UserResponse> userResponses = userService.getSellerByUserId();
         return ApiResponse.<List<UserResponse>>builder()
                 .message("Get user from seller success")

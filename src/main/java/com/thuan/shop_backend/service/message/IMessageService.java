@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface IMessageService {
     void saveMessage(MessageRequest messageRequest);
-    MessageResponses findChatMessages(long chatId, int page, int size);
+    MessageResponses findChatMessages(long chatId);
     void setMessagesToSeen(long chatId);
 }

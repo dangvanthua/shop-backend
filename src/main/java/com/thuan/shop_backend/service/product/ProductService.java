@@ -51,7 +51,7 @@ public class ProductService implements IProductService{
     @PreAuthorize("hasRole('SELLER') OR hasRole('ADMIN')")
     public Product createProduct(ProductRequest productRequest) {
 
-        Seller seller = sellerRepository.findById(productRequest.getSellerId())
+        Seller seller = sellerRepository.findByUserId(productRequest.getSellerId())
                 .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
 
         Category category = categoryRepository.findById(productRequest.getCategoryId())

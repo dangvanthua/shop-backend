@@ -69,21 +69,18 @@ public class MessageService implements IMessageService{
     }
 
     @Override
-    public MessageResponses findChatMessages(long chatId, int page, int size) {
+    public MessageResponses findChatMessages(long chatId) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        List<Message> messages = messageRepository.findMessagesByChatId(chatId);
 
-        Page<Message> messagePage = messageRepository.findMessagesByChatId(chatId, pageable);
-
-        List<MessageResponse> messageResponses = messagePage.getContent()
+        List<MessageResponse> messageResponses = messages
                 .stream()
                 .map(MessageResponse::fromMessage)
-                .toList();
+                .toList()
+                .reversed();
 
         return MessageResponses.builder()
                 .messageResponses(messageResponses)
-                .totalElements(messagePage.getTotalElements())
-                .totalPages(messagePage.getTotalPages())
                 .build();
     }
 
