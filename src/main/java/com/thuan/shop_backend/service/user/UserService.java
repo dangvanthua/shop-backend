@@ -204,7 +204,8 @@ public class UserService implements IUserService{
     public void deleteUser(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        userRepository.delete(user);
+        user.setIsActive(false);
+        userRepository.save(user);
     }
 
     @Override
