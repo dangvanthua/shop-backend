@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thuan.shop_backend.component.AuthComponent;
 import com.thuan.shop_backend.constant.OrderStatus;
 import com.thuan.shop_backend.dto.request.product.ProductRequest;
 import com.thuan.shop_backend.dto.response.product.ProductDetailResponse;
@@ -16,6 +17,7 @@ import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import com.thuan.shop_backend.service.file.IFileService;
+import com.thuan.shop_backend.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +26,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +46,8 @@ public class ProductService implements IProductService{
 
     private final IFileService fileService;
     private final IProductRedisService productRedisService;
+    private final IUserService userService;
+    private final AuthComponent authComponent;
 
     @Override
     @Transactional
@@ -79,39 +82,31 @@ public class ProductService implements IProductService{
             Map<String, String> productImageUrl,
             boolean isThumbnail) {
 
-        // Lấy sản phẩm từ cơ sở dữ liệu
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
-        // Kiểm tra số lượng ảnh chính (isThumbnail)
         long existingThumbnailCount = productImageRepository
                 .countByProductIdAndImage(productId, true);
 
-        // Nếu đang upload ảnh chính mới và đã có ảnh chính cũ, xóa ảnh chính cũ
         if (isThumbnail && existingThumbnailCount > 0) {
-            // Tìm ảnh chính cũ và xóa nó
             List<ProductImage> existingThumbnails = productImageRepository
                     .findByProductIdAndImage(productId, true);
 
             if(!existingThumbnails.isEmpty()) {
                 ProductImage existingThumbnail = existingThumbnails.getFirst();
 
-                // Xóa ảnh cũ trên Cloudinary nếu có
                 if (existingThumbnail.getCloudinaryPublicId() != null) {
                     fileService.deleteFile(existingThumbnail.getCloudinaryPublicId());
                 }
 
-                // Xóa ảnh chính cũ trong cơ sở dữ liệu
                 productImageRepository.delete(existingThumbnail);
             }
         }else {
-            // Kiểm tra số lượng hình ảnh gallery
             long galleryCount = productImageRepository
                     .countByProductIdAndImage(productId, false);
 
             int maxGalleries = 5;
 
-            // Vuot qua gioi han hinh cho phep xoa hinh anh cu
             if(galleryCount + productImageUrl.size() > maxGalleries) {
                 List<ProductImage> galleryImages = productImageRepository
                         .findByProductIdAndImage(productId, false);
@@ -120,18 +115,16 @@ public class ProductService implements IProductService{
 
                 for(int i = 0; i < excessCount; i++) {
                     ProductImage oldProductImage = galleryImages.get(i);
-                    // xoa anh tren cloudinary
+
                     if(oldProductImage.getCloudinaryPublicId() != null) {
                         fileService.deleteFile(oldProductImage.getCloudinaryPublicId());
                     }
 
-                    // xoa anh trong co so du lieu
                     productImageRepository.delete(oldProductImage);
                 }
             }
         }
 
-        // Upload và lưu các ảnh mới
         productImageUrl.forEach((cloudinaryPublicId, imageUrl) -> {
             ProductImage productImage = ProductImage.builder()
                     .product(product)
@@ -206,13 +199,11 @@ public class ProductService implements IProductService{
 
     @Override
     public ProductDetailResponse getProductDetail(long productId) {
-        // Lấy thông tin sản phẩm
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
-        // Lấy danh sách hình ảnh của sản phẩm, trả về danh sách rỗng nếu không có ảnh
         List<ProductImageResponse> imageResponses = Optional.ofNullable(productImageRepository.findByProductId(product.getId()))
-                .orElse(Collections.emptyList())  // Trả về danh sách rỗng nếu không có hình ảnh
+                .orElse(Collections.emptyList())
                 .stream()
                 .map(image -> ProductImageResponse.builder()
                         .imageUrl(image.getImageUrl())
@@ -220,18 +211,16 @@ public class ProductService implements IProductService{
                         .build())
                 .collect(Collectors.toList());
 
-        // Lấy thông tin người bán sản phẩm
+
         Seller seller = sellerRepository.findSellerByProductId(product.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
 
         long totalProductsSold = sellerRepository.countProductsSoldBySeller(seller.getId());
         long totalReviews = reviewRepository.countReviewsBySellerId(seller.getId());
 
-        // Tạo thông tin người bán
         SellerInfoResponse sellerInfo = SellerInfoResponse.fromSeller(
                 seller, totalProductsSold, totalReviews);
 
-        // Lay thoi gian hien tai
         List<ProductPromotionCode> productPromotionCode = promotionCodeRepository
                 .findByProductId(product.getId(), LocalDate.now());
 
@@ -239,7 +228,6 @@ public class ProductService implements IProductService{
                 .map(PromotionCodeResponse::fromProductPromotion)
                 .toList();
 
-        // Tạo response và trả về
         return ProductDetailResponse.fromProductDetail(
                 product,
                 imageResponses,
@@ -249,10 +237,25 @@ public class ProductService implements IProductService{
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('SELLER')")
     public Product updateProduct(long productId, ProductRequest productRequest) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+
+        boolean isAdmin = authComponent.checkIsAdmin();
+
+        if(!isAdmin) {
+            String emailUser = authComponent.getEmailFromAuthentication();
+            User user = userService.getUserByEmail(emailUser);
+
+            Seller seller = sellerRepository.findSellerByProductId(productId)
+                    .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
+
+            if(!seller.getUser().getId().equals(user.getId())) {
+                throw new AppException(ErrorCode.UNAUTHORIZED);
+            }
+        }
 
         if(productRequest.getName() != null) {
             product.setName(productRequest.getName());
@@ -270,6 +273,17 @@ public class ProductService implements IProductService{
             product.setQuantity(productRequest.getQuantity());
         }
 
+        return productRepository.save(product);
+    }
+
+    @Override
+    @Transactional
+    public Product updateProductQuantity(long productId, ProductRequest productRequest) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+        if(productRequest.getQuantity() > 0) {
+            product.setQuantity(productRequest.getQuantity());
+        }
         return productRepository.save(product);
     }
 

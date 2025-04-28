@@ -9,6 +9,7 @@ import com.thuan.shop_backend.exception.AppException;
 import com.thuan.shop_backend.exception.ErrorCode;
 import com.thuan.shop_backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,11 +86,9 @@ public class SellerService implements ISellerService {
     }
 
     @Override
-    public List<SellerResponse> getAllSellers() {
-        List<Seller> sellers = sellerRepository.findAll();
-        return sellers.stream()
-                .map(SellerResponse::fromSeller)
-                .toList();
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Seller> getAllSellers() {
+        return sellerRepository.findAll();
     }
 
     @Override
@@ -110,9 +109,8 @@ public class SellerService implements ISellerService {
     }
 
     @Override
-    public SellerResponse getSeller(long sellerId) {
-        Seller seller = sellerRepository.findById(sellerId)
+    public Seller getSeller(long sellerId) {
+        return sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new AppException(ErrorCode.SELLER_NOT_EXISTED));
-        return SellerResponse.fromSeller(seller);
     }
 }

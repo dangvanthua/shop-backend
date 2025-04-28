@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ISellerService {
     Seller createSeller(SellerRequest sellerRequest);
-    List<SellerResponse> getAllSellers();
+    List<Seller> getAllSellers();
     Seller updateSeller(SellerRequest sellerRequest);
-    SellerResponse getSeller(long sellerId);
+    Seller getSeller(long sellerId);
 }

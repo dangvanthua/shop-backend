@@ -149,7 +149,7 @@ public class OrderService implements IOrderService{
                     .quantity(product.getQuantity() - cartItem.getQuantity())
                     .build();
 
-            productService.updateProduct(product.getId(), productRequest);
+            productService.updateProductQuantity(product.getId(), productRequest);
         }
 
         MailRequest mailRequest = MailRequest.builder()

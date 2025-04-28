@@ -43,6 +43,7 @@ import java.util.*;
 public class AuthService implements IAuthService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
@@ -127,8 +128,6 @@ public class AuthService implements IAuthService{
         User user = null;
 
         if(!isSocialAccount) {
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-
             user = userRepository.findByPhoneNumber(auth.getPhoneNumber())
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 

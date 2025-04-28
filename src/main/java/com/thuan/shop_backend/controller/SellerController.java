@@ -30,7 +30,10 @@ public class SellerController {
 
     @GetMapping
     public ApiResponse<List<SellerResponse>> getAllSellers() {
-        List<SellerResponse> sellerResponses = sellerService.getAllSellers();
+        List<Seller> sellers = sellerService.getAllSellers();
+        List<SellerResponse> sellerResponses = sellers.stream()
+                .map(SellerResponse::fromSeller)
+                .toList();
         return ApiResponse.<List<SellerResponse>>builder()
                 .message("Get all sellers success")
                 .result(sellerResponses)
@@ -49,7 +52,8 @@ public class SellerController {
 
     @GetMapping("/{id}")
     public ApiResponse<SellerResponse> getSeller(@PathVariable("id") long sellerId) {
-        SellerResponse sellerResponse = sellerService.getSeller(sellerId);
+        Seller seller = sellerService.getSeller(sellerId);
+        SellerResponse sellerResponse = SellerResponse.fromSeller(seller);
         return ApiResponse.<SellerResponse>builder()
                 .message("Get seller success")
                 .result(sellerResponse)

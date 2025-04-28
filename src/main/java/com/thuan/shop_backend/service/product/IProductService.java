@@ -17,5 +17,6 @@ public interface IProductService {
     Page<ProductResponse> getFeatureProducts(int page, int size);
     ProductDetailResponse getProductDetail(long productId);
     Product updateProduct(long productId, ProductRequest productRequest);
+    Product updateProductQuantity(long productId, ProductRequest productRequest);
     List<ProductResponse> getProductByKeyWord(String keyword);
 }

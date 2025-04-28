@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
                     .getFirst()
                     .unwrap(ConstraintViolation.class);
 
-            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
+//            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
 
         }catch (IllegalArgumentException e) {
 

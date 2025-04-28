@@ -16,4 +16,11 @@ public class AuthComponent {
         }
         throw new AppException(ErrorCode.UNAUTHENTICATED);
     }
+
+    public boolean checkIsAdmin() {
+        return SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(grantedAuthority ->
+                        grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+    }
 }
